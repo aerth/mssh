@@ -118,32 +118,46 @@ void mssh_window_new_session(MSSHWindow* window, char **env,
 
 	args[0] = strdup("ssh");
 
-    window->table = gtk_table_new(rows, num_servers > 1 ? 2 : 1, TRUE);
+    window->table = gtk_table_new(rows, 2, TRUE);
 	gtk_box_pack_start(GTK_BOX(window->vbox), window->table,
 		TRUE, TRUE, 0);
 
 	for(i = 0; i < rows; i++)
 	{
-		for(j = 0; j < (num_servers > 1 ? 2 : 1); j++)
+		for(j = 0; j < 2; j++)
 		{
 			k = j + i*2;
-			args[1] = window->servers[k];
-			window->terms[k] = vte_terminal_new();
-		    g_signal_connect(G_OBJECT(window->terms[k]), "child-exited",
-				G_CALLBACK(vte_child_exited), window);
-			vte_terminal_fork_command(VTE_TERMINAL(window->terms[k]),
-				"ssh", args, window->env, NULL, FALSE, FALSE,
-				FALSE);
-			gtk_table_attach(GTK_TABLE(window->table), window->terms[k],
-				j, j+1, i, i+1,	GTK_FILL | GTK_EXPAND,
-				GTK_FILL | GTK_EXPAND, 2, 2);
+			if(k < num_servers)
+			{
+				args[1] = window->servers[k];
+				window->terms[k] = vte_terminal_new();
+			    g_signal_connect(G_OBJECT(window->terms[k]),
+					"child-exited", G_CALLBACK(vte_child_exited), window);
+				vte_terminal_fork_command(VTE_TERMINAL(window->terms[k]),
+					"ssh", args, window->env, NULL, FALSE, FALSE,
+					FALSE);
+				if((k == num_servers - 1) && (num_servers % 2 == 1))
+				{
+					gtk_table_attach(GTK_TABLE(window->table),
+						window->terms[k], j, j+2, i, i+1,
+						GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 2,
+						2);
+				}
+				else
+				{
+					gtk_table_attach(GTK_TABLE(window->table),
+						window->terms[k], j, j+1, i, i+1,
+						GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 2,
+						2);
+				}
 
-			window->items[k] = gtk_check_menu_item_new_with_label(
-				window->servers[k]);
-			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
-				window->items[k]), TRUE);
-			gtk_menu_shell_append(GTK_MENU_SHELL(window->server_menu),
-				window->items[k]);
+				window->items[k] = gtk_check_menu_item_new_with_label(
+					window->servers[k]);
+				gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
+					window->items[k]), TRUE);
+				gtk_menu_shell_append(GTK_MENU_SHELL(window->server_menu),
+					window->items[k]);
+			}
 		}
 	}
 
