@@ -13,8 +13,8 @@
 
 static void on_mssh_destroy(GtkWidget *widget, gpointer data)
 {
-    gtk_widget_hide(widget);
-    gtk_main_quit();
+	gtk_widget_hide(widget);
+	gtk_main_quit();
 }
 
 void usage(const char *argv0)
@@ -33,27 +33,27 @@ void usage(const char *argv0)
 
 int main(int argc, char* argv[], char* env[])
 {
-    GtkWidget* window;
+	GtkWidget* window;
 	int c, option_index = 0;
 	int i, nhosts = 0;
 	char **hosts = NULL;
 
 	static struct option long_options[] =
-    {
-    	{"help",	no_argument,	0, 'h'},
-    	{"version",	no_argument,	0, 'V'},
-        {0, 0, 0, 0}
-    };
+	{
+		{"help",	no_argument,	0, 'h'},
+		{"version",	no_argument,	0, 'V'},
+		{0, 0, 0, 0}
+	};
 
 	for(;;)
 	{
 		c = getopt_long(argc, argv, "hV", long_options, &option_index);
 
 		if(c == -1)
-        	break;
+			break;
 
-        switch(c)
-        {
+		switch(c)
+		{
 		case 'h':
 			usage(argv[0]);
 			break;
@@ -109,22 +109,22 @@ int main(int argc, char* argv[], char* env[])
 		usage(argv[0]);
 	}
 
-    gtk_init(&argc, &argv);
+	gtk_init(&argc, &argv);
 
-    window = GTK_WIDGET(mssh_window_new());
+	window = GTK_WIDGET(mssh_window_new());
 
-    g_signal_connect(G_OBJECT(window), "destroy",
-        G_CALLBACK(on_mssh_destroy), NULL);
+	g_signal_connect(G_OBJECT(window), "destroy",
+		G_CALLBACK(on_mssh_destroy), NULL);
 
 	mssh_window_new_session(MSSH_WINDOW(window), env, nhosts, hosts);
 
-    gtk_widget_show_all(window);
-    gtk_main();
+	gtk_widget_show_all(window);
+	gtk_main();
 
 	for(i = 0; i < nhosts; i++)
 		free(hosts[i]);
 
 	free(hosts);
 
-    return 0;
+	return 0;
 }

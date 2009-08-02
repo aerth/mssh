@@ -14,7 +14,7 @@ static void mssh_window_destroy(GtkWidget *widget, gpointer data)
 
 GtkWidget* mssh_window_new(void)
 {
-    return g_object_new(MSSH_TYPE_WINDOW, NULL);
+	return g_object_new(MSSH_TYPE_WINDOW, NULL);
 }
 
 gboolean key_press(GtkWidget *widget, GdkEventKey *event,
@@ -80,8 +80,8 @@ static void mssh_window_init(MSSHWindow* window)
 
 	gtk_menu_shell_append(GTK_MENU_SHELL(window->file_menu),
 		window->file_quit);
-    g_signal_connect(G_OBJECT(window->file_quit), "activate",
-        G_CALLBACK(mssh_window_destroy), NULL);
+	g_signal_connect(G_OBJECT(window->file_quit), "activate",
+		G_CALLBACK(mssh_window_destroy), NULL);
 	gtk_widget_add_accelerator(window->file_quit, "activate", accel_group,
 		GDK_W, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 	gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
@@ -99,10 +99,10 @@ static void mssh_window_init(MSSHWindow* window)
 	gtk_box_pack_start(GTK_BOX(window->vbox), window->entry,
 		FALSE, TRUE, 2);
 
-    gtk_container_add(GTK_CONTAINER(window), window->vbox);
+	gtk_container_add(GTK_CONTAINER(window), window->vbox);
 
-    gtk_widget_set_size_request(GTK_WIDGET(window), 1024, 768);
-    gtk_window_set_title(GTK_WINDOW(window), "MSSH");
+	gtk_widget_set_size_request(GTK_WIDGET(window), 1024, 768);
+	gtk_window_set_title(GTK_WINDOW(window), "MSSH");
 }
 
 void mssh_window_new_session(MSSHWindow* window, char **env,
@@ -118,7 +118,7 @@ void mssh_window_new_session(MSSHWindow* window, char **env,
 
 	args[0] = strdup("ssh");
 
-    window->table = gtk_table_new(rows, 2, TRUE);
+	window->table = gtk_table_new(rows, 2, TRUE);
 	gtk_box_pack_start(GTK_BOX(window->vbox), window->table,
 		TRUE, TRUE, 0);
 
@@ -131,7 +131,7 @@ void mssh_window_new_session(MSSHWindow* window, char **env,
 			{
 				args[1] = window->servers[k];
 				window->terms[k] = vte_terminal_new();
-			    g_signal_connect(G_OBJECT(window->terms[k]),
+				g_signal_connect(G_OBJECT(window->terms[k]),
 					"child-exited", G_CALLBACK(vte_child_exited), window);
 				vte_terminal_fork_command(VTE_TERMINAL(window->terms[k]),
 					"ssh", args, window->env, NULL, FALSE, FALSE,

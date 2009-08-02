@@ -6,28 +6,28 @@
 
 G_BEGIN_DECLS
 
-#define MSSH_TYPE_WINDOW            mssh_window_get_type()
-#define MSSH_WINDOW(obj)            G_TYPE_CHECK_INSTANCE_CAST(obj,\
-    MSSH_TYPE_WINDOW, MSSHWindow)
-#define MSSH_WINDOW_CLASS(klass)    G_TYPE_CHECK_CLASS_CAST(klass,\
-    MSSH_WINDOW_TYPE, MSSHWindowClass)
-#define IS_MSSH_WINDOW(obj)         G_TYPE_CHECK_INSTANCE_TYPE(obj,\
-    MSSH_TYPE_WINDOW)
+#define MSSH_TYPE_WINDOW			mssh_window_get_type()
+#define MSSH_WINDOW(obj)			G_TYPE_CHECK_INSTANCE_CAST(obj,\
+	MSSH_TYPE_WINDOW, MSSHWindow)
+#define MSSH_WINDOW_CLASS(klass)	G_TYPE_CHECK_CLASS_CAST(klass,\
+	MSSH_WINDOW_TYPE, MSSHWindowClass)
+#define IS_MSSH_WINDOW(obj)			G_TYPE_CHECK_INSTANCE_TYPE(obj,\
+	MSSH_TYPE_WINDOW)
 #define IS_MSSH_WINDOW_CLASS(klass) G_TYPE_CHECK_CLASS_TYPE(klass,\
-    MSSH_TYPE_WINDOW)
+	MSSH_TYPE_WINDOW)
 
 typedef struct
 {
-    GtkWindow widget;
-    GtkWidget *vbox;
-    GtkWidget *entry;
-    GtkWidget *table;
-    GtkWidget *menu_bar;
-    GtkWidget *server_menu;
-    GtkWidget *file_menu;
-    GtkWidget *server_item;
-    GtkWidget *file_item;
-    GtkWidget *file_quit;
+	GtkWindow widget;
+	GtkWidget *vbox;
+	GtkWidget *entry;
+	GtkWidget *table;
+	GtkWidget *menu_bar;
+	GtkWidget *server_menu;
+	GtkWidget *file_menu;
+	GtkWidget *server_item;
+	GtkWidget *file_item;
+	GtkWidget *file_quit;
 	char **env;
 	char **servers;
 	int num_servers;
@@ -37,7 +37,7 @@ typedef struct
 
 typedef struct
 {
-    GtkWindowClass parent_class;
+	GtkWindowClass parent_class;
 } MSSHWindowClass;
 
 GType mssh_window_get_type(void) G_GNUC_CONST;
