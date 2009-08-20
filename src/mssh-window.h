@@ -27,6 +27,7 @@ typedef struct
 	GtkWidget *file_menu;
 	GtkWidget *server_item;
 	GtkWidget *file_item;
+	GtkWidget *file_sendhost;
 	GtkWidget *file_quit;
 	char **env;
 	char **servers;
