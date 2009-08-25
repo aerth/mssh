@@ -32,8 +32,8 @@ typedef struct
 	char **env;
 	char **servers;
 	int num_servers;
-	GtkWidget *items[32];
-	GtkWidget *terms[32];
+	GtkWidget **items;
+	GtkWidget **terms;
 } MSSHWindow;
 
 typedef struct
