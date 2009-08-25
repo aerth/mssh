@@ -1,3 +1,13 @@
+2009-08-25  Bradley Smith  <brad@brad-smith.co.uk>
+
+	Bump version to 0.2.
+
+	Fix segfault with > 32 servers.
+
+2009-08-20  Bradley Smith  <brad@brad-smith.co.uk>
+
+	Add option to send hostname.
+
 2009-08-02  Bradley Smith  <brad@brad-smith.co.uk>
 
 	Fix indentation.
