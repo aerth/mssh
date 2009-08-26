@@ -116,7 +116,7 @@ int main(int argc, char* argv[], char* env[])
 	g_signal_connect(G_OBJECT(window), "destroy",
 		G_CALLBACK(on_mssh_destroy), NULL);
 
-	mssh_window_new_session(MSSH_WINDOW(window), env, nhosts, hosts);
+	mssh_window_start_session(MSSH_WINDOW(window), env, nhosts, hosts);
 
 	gtk_widget_show_all(window);
 	gtk_main();
