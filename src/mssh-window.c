@@ -4,12 +4,14 @@
 #include <gdk/gdkkeysyms.h>
 
 #include "mssh-terminal.h"
+#include "mssh-pref.h"
 #include "mssh-window.h"
 
 #include "config.h"
 
 static void mssh_window_sendhost(GtkWidget *widget, gpointer data);
 static void mssh_window_destroy(GtkWidget *widget, gpointer data);
+static void mssh_window_pref(GtkWidget *widget, gpointer data);
 static gboolean mssh_window_key_press(GtkWidget *widget,
 	GdkEventKey *event, gpointer data);
 static gboolean mssh_window_entry_focused(GtkWidget *widget,
@@ -79,6 +81,19 @@ static void mssh_window_destroy(GtkWidget *widget, gpointer data)
 
 		gtk_widget_destroy(dialog);
 	}
+}
+
+static void mssh_window_pref(GtkWidget *widget, gpointer data)
+{
+	MSSHWindow *window = MSSH_WINDOW(data);
+	GtkWidget *pref = mssh_pref_new();
+
+	gtk_window_set_transient_for(GTK_WINDOW(pref), GTK_WINDOW(window));
+	gtk_window_set_modal(GTK_WINDOW(pref), TRUE);
+	gtk_window_set_position(GTK_WINDOW(pref),
+		GTK_WIN_POS_CENTER_ON_PARENT);
+
+	gtk_widget_show_all(pref);
 }
 
 static gboolean mssh_window_key_press(GtkWidget *widget,
@@ -221,32 +236,42 @@ static void mssh_window_init(MSSHWindow* window)
 
 	GtkWidget *menu_bar = gtk_menu_bar_new();
 	GtkWidget *file_menu = gtk_menu_new();
+	GtkWidget *edit_menu = gtk_menu_new();
 
-	GtkWidget *server_item = gtk_menu_item_new_with_label("Servers");
 	GtkWidget *file_item = gtk_menu_item_new_with_label("File");
+	GtkWidget *edit_item = gtk_menu_item_new_with_label("Edit");
+	GtkWidget *server_item = gtk_menu_item_new_with_label("Servers");
 
 	GtkWidget *file_quit = gtk_image_menu_item_new_from_stock(
 		GTK_STOCK_QUIT, NULL);
 	GtkWidget *file_sendhost = gtk_image_menu_item_new_with_label(
 		"Send hostname");
 
+	GtkWidget *edit_pref = gtk_image_menu_item_new_from_stock(
+		GTK_STOCK_PREFERENCES, NULL);
+
 	window->server_menu = gtk_menu_new();
 
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_item), file_menu);
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(server_item),
 		window->server_menu);
 
 	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_sendhost);
 	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_quit);
+	gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_pref);
 	g_signal_connect(G_OBJECT(file_sendhost), "activate",
 		G_CALLBACK(mssh_window_sendhost), window);
 	g_signal_connect(G_OBJECT(file_quit), "activate",
 		G_CALLBACK(mssh_window_destroy), window);
+	g_signal_connect(G_OBJECT(edit_pref), "activate",
+		G_CALLBACK(mssh_window_pref), window);
 	gtk_widget_add_accelerator(file_quit, "activate", accel_group,
 		GDK_W, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 	gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
 
 	gtk_menu_bar_append(GTK_MENU_BAR(menu_bar), file_item);
+	gtk_menu_bar_append(GTK_MENU_BAR(menu_bar), edit_item);
 	gtk_menu_bar_append(GTK_MENU_BAR(menu_bar), server_item);
 
 	g_signal_connect(G_OBJECT(entry), "key-press-event",

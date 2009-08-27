@@ -4,7 +4,7 @@ INCLUDES = $(MSSH_CFLAGS)
 
 bin_PROGRAMS = mssh
 
-mssh_SOURCES = mssh.c mssh-terminal.c mssh-window.c
+mssh_SOURCES = mssh.c mssh-terminal.c mssh-window.c mssh-pref.c
 mssh_LDADD = $(MSSH_LIBS)
 
 EXTRA_DIST = mssh-window.h
