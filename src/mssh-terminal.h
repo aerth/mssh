@@ -21,6 +21,7 @@ typedef struct
 	VteTerminal vte;
 	GtkWidget *menu_item;
 	char *hostname;
+	int started;
 } MSSHTerminal;
 
 typedef struct
@@ -39,8 +40,8 @@ GType mssh_terminal_get_type(void) G_GNUC_CONST;
 GtkWidget* mssh_terminal_new(void);
 void mssh_terminal_destroy(MSSHTerminal *terminal);
 gboolean mssh_terminal_isactive(MSSHTerminal *terminal);
-void mssh_terminal_start_session(MSSHTerminal *terminal, char *hostnane,
-	char **env);
+void mssh_terminal_init_session(MSSHTerminal *terminal, char *hostname);
+void mssh_terminal_start_session(MSSHTerminal *terminal, char **env);
 void mssh_terminal_send_host(MSSHTerminal *terminal);
 void mssh_terminal_send_data(MSSHTerminal *terminal, GdkEventKey *event);
 

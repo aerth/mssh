@@ -27,25 +27,27 @@ gboolean mssh_terminal_isactive(MSSHTerminal *terminal)
 		GTK_CHECK_MENU_ITEM(terminal->menu_item));
 }
 
-void mssh_terminal_start_session(MSSHTerminal *terminal, char *hostname,
-	char **env)
+void mssh_terminal_init_session(MSSHTerminal *terminal, char *hostname)
+{
+	terminal->hostname = hostname;
+
+	terminal->menu_item = gtk_check_menu_item_new_with_label(
+		terminal->hostname);
+
+	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
+		terminal->menu_item), TRUE);
+}
+
+void mssh_terminal_start_session(MSSHTerminal *terminal, char **env)
 {
 	char *args[3];
-
-	terminal->hostname = hostname;
 
 	args[0] = strdup("ssh");
 	args[1] = terminal->hostname;
 	args[2] = NULL;
 
-	terminal->menu_item = gtk_check_menu_item_new_with_label(
-		terminal->hostname);
-
 	vte_terminal_fork_command(VTE_TERMINAL(terminal), "ssh", args,
 		env, NULL, FALSE, FALSE, FALSE);
-
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
-		terminal->menu_item), TRUE);
 
 	free(args[0]);
 }
@@ -71,6 +73,8 @@ void mssh_terminal_send_data(MSSHTerminal *terminal, GdkEventKey *event)
 
 static void mssh_terminal_init(MSSHTerminal* terminal)
 {
+	terminal->started = 0;
+
 	g_signal_connect(G_OBJECT(terminal), "child-exited",
 		G_CALLBACK(mssh_terminal_child_exited), terminal);
 	g_signal_connect(G_OBJECT(terminal), "focus-in-event",
