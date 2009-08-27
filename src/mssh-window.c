@@ -149,6 +149,8 @@ static gboolean mssh_window_session_close(gpointer data)
 	}
 	else
 	{
+		gtk_widget_destroy(data_pair->terminal->menu_item);
+
 		gtk_container_remove(GTK_CONTAINER(data_pair->window->table),
 			GTK_WIDGET(data_pair->terminal));
 
