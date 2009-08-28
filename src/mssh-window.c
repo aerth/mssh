@@ -1,10 +1,12 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <gconf/gconf-client.h>
 #include <gdk/gdkkeysyms.h>
 
 #include "mssh-terminal.h"
 #include "mssh-pref.h"
+#include "mssh-gconf.h"
 #include "mssh-window.h"
 
 #include "config.h"
@@ -212,6 +214,8 @@ static void mssh_window_session_focused(MSSHTerminal *terminal,
 
 static void mssh_window_relayout(MSSHWindow *window)
 {
+	GConfClient *client;
+	GConfEntry *entry;
 	int i, len = window->terminals->len;
 
 	for(i = 0; i < len; i++)
@@ -242,6 +246,12 @@ static void mssh_window_relayout(MSSHWindow *window)
 	{
 		gtk_table_resize(GTK_TABLE(window->table), ((len + 1) / 2), 2);
 	}
+
+	client = gconf_client_get_default();
+
+	entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FONT, NULL,
+		TRUE, NULL);
+	mssh_gconf_notify_font(client, 0, entry, window);
 }
 
 static void mssh_window_add_session(MSSHWindow *window, char *hostname)
@@ -263,6 +273,8 @@ static void mssh_window_add_session(MSSHWindow *window, char *hostname)
 
 static void mssh_window_init(MSSHWindow* window)
 {
+	GConfClient *client;
+
 	GtkAccelGroup *accel_group = gtk_accel_group_new();
 	GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
 	GtkWidget *entry = gtk_entry_new();
@@ -286,6 +298,8 @@ static void mssh_window_init(MSSHWindow* window)
 		GTK_STOCK_PREFERENCES, NULL);
 
 	window->server_menu = gtk_menu_new();
+
+	window->terminals = g_array_new(FALSE, TRUE, sizeof(MSSHTerminal*));
 
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_item), file_menu);
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);
@@ -327,6 +341,14 @@ static void mssh_window_init(MSSHWindow* window)
 
 	gtk_widget_set_size_request(GTK_WIDGET(window), 1024, 768);
 	gtk_window_set_title(GTK_WINDOW(window), PACKAGE_NAME);
+
+	client = gconf_client_get_default();
+
+	gconf_client_add_dir(client, MSSH_GCONF_PATH,
+		GCONF_CLIENT_PRELOAD_RECURSIVE, NULL);
+
+	gconf_client_notify_add(client, MSSH_GCONF_KEY_FONT,
+		mssh_gconf_notify_font, window, NULL, NULL);
 }
 
 void mssh_window_start_session(MSSHWindow* window, char **env, int nhosts,
@@ -336,7 +358,6 @@ void mssh_window_start_session(MSSHWindow* window, char **env, int nhosts,
 	int rows = (nhosts / 2) + (nhosts % 2);
 
 	window->env = env;
-	window->terminals = g_array_new(FALSE, TRUE, sizeof(MSSHTerminal*));
 
 	for(i = 0; i < rows; i++)
 	{

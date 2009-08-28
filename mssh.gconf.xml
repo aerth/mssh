@@ -1,0 +1,15 @@
+<gconfschemafile>
+    <schemalist>
+        <schema>
+            <key>/schemas/apps/mssh/font</key>
+            <applyto>/apps/mssh/font</applyto>
+            <owner>mssh</owner>
+            <type>string</type>
+            <default>Monospace 10</default>
+            <locale name="C">
+                <short>Terminal font</short>
+                <long>Font to use for all MSSH terminals</long>
+            </locale>
+        </schema>
+    </schemalist>
+</gconfschemafile>

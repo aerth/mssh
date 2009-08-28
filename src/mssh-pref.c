@@ -1,3 +1,7 @@
+#include <gconf/gconf-client.h>
+
+#include "mssh-gconf.h"
+
 #include "mssh-pref.h"
 
 static void mssh_pref_init(MSSHPref* pref);
@@ -17,8 +21,24 @@ static void mssh_pref_close(GtkWidget *widget, gpointer data)
 	gtk_widget_destroy(GTK_WIDGET(pref));
 }
 
+static void mssh_pref_font_select(GtkWidget *widget, gpointer data)
+{
+	GConfClient *client;
+	const gchar *font;
+
+	client = gconf_client_get_default();
+
+	font = gtk_font_button_get_font_name(GTK_FONT_BUTTON(widget));
+
+	gconf_client_set_string(client, MSSH_GCONF_KEY_FONT, font, NULL);
+}
+
 static void mssh_pref_init(MSSHPref* pref)
 {
+	GConfClient *client;
+	GConfEntry *entry;
+	GConfValue *value;
+
 	GtkWidget *frame = gtk_vbox_new(FALSE, 5);
 	GtkWidget *notebook = gtk_notebook_new();
 	GtkWidget *content = gtk_vbox_new(FALSE, 4);
@@ -103,6 +123,17 @@ static void mssh_pref_init(MSSHPref* pref)
 	gtk_container_set_border_width(GTK_CONTAINER(pref), 15);
 	gtk_window_set_title(GTK_WINDOW(pref), "Preferences");
 	gtk_window_set_resizable(GTK_WINDOW(pref), FALSE);
+
+	g_signal_connect(G_OBJECT(font_select), "font-set",
+		G_CALLBACK(mssh_pref_font_select), NULL);
+
+	client = gconf_client_get_default();
+
+	entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FONT, NULL,
+		TRUE, NULL);
+	value = gconf_entry_get_value(entry);
+	gtk_font_button_set_font_name(GTK_FONT_BUTTON(font_select),
+		gconf_value_get_string(value));
 }
 
 static void mssh_pref_class_init(MSSHPrefClass *klass)
