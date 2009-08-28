@@ -232,7 +232,7 @@ static void mssh_window_relayout(MSSHWindow *window)
 
 		gtk_table_attach(GTK_TABLE(window->table), GTK_WIDGET(terminal),
 			(i % 2), (i == len - 1) ? 2 : (i % 2) + 1, i / 2, (i / 2) + 1,
-			GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 2, 2);
+			GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 1, 1);
 		g_object_unref(terminal);
 
 		if(!terminal->started)
