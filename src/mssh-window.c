@@ -249,9 +249,17 @@ static void mssh_window_relayout(MSSHWindow *window)
 
 	client = gconf_client_get_default();
 
+	gtk_widget_show_all(GTK_WIDGET(window));
+
 	entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FONT, NULL,
 		TRUE, NULL);
 	mssh_gconf_notify_font(client, 0, entry, window);
+	entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FG_COLOUR, NULL,
+		TRUE, NULL);
+	mssh_gconf_notify_fg_colour(client, 0, entry, window);
+	entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BG_COLOUR, NULL,
+		TRUE, NULL);
+	mssh_gconf_notify_bg_colour(client, 0, entry, window);
 }
 
 static void mssh_window_add_session(MSSHWindow *window, char *hostname)
@@ -349,6 +357,10 @@ static void mssh_window_init(MSSHWindow* window)
 
 	gconf_client_notify_add(client, MSSH_GCONF_KEY_FONT,
 		mssh_gconf_notify_font, window, NULL, NULL);
+	gconf_client_notify_add(client, MSSH_GCONF_KEY_FG_COLOUR,
+		mssh_gconf_notify_fg_colour, window, NULL, NULL);
+	gconf_client_notify_add(client, MSSH_GCONF_KEY_BG_COLOUR,
+		mssh_gconf_notify_bg_colour, window, NULL, NULL);
 }
 
 void mssh_window_start_session(MSSHWindow* window, char **env, int nhosts,

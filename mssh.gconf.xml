@@ -11,5 +11,27 @@
                 <long>Font to use for all MSSH terminals</long>
             </locale>
         </schema>
+        <schema>
+            <key>/schemas/apps/mssh/fg_colour</key>
+            <applyto>/apps/mssh/fg_colour</applyto>
+            <owner>mssh</owner>
+            <type>string</type>
+            <default>#ffffffffffff</default>
+            <locale name="C">
+                <short>Terminal foreground colour</short>
+                <long>Foreground colour to use for all MSSH terminals</long>
+            </locale>
+        </schema>
+        <schema>
+            <key>/schemas/apps/mssh/bg_colour</key>
+            <applyto>/apps/mssh/bg_colour</applyto>
+            <owner>mssh</owner>
+            <type>string</type>
+            <default>#000000000000</default>
+            <locale name="C">
+                <short>Terminal background colour</short>
+                <long>Background colour to use for all MSSH terminals</long>
+            </locale>
+        </schema>
     </schemalist>
 </gconfschemafile>

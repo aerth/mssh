@@ -33,11 +33,45 @@ static void mssh_pref_font_select(GtkWidget *widget, gpointer data)
 	gconf_client_set_string(client, MSSH_GCONF_KEY_FONT, font, NULL);
 }
 
+static void mssh_pref_fg_colour_select(GtkWidget *widget, gpointer data)
+{
+	GConfClient *client;
+	GdkColor colour;
+	const gchar *colour_s;
+
+	client = gconf_client_get_default();
+
+	gtk_color_button_get_color(GTK_COLOR_BUTTON(widget), &colour);
+	colour_s = gdk_color_to_string(&colour);
+
+	gconf_client_set_string(client, MSSH_GCONF_KEY_FG_COLOUR, colour_s,
+		NULL);
+}
+
+static void mssh_pref_bg_colour_select(GtkWidget *widget, gpointer data)
+{
+	GConfClient *client;
+	GdkColor colour;
+	const gchar *colour_s;
+
+	client = gconf_client_get_default();
+
+	gtk_color_button_get_color(GTK_COLOR_BUTTON(widget), &colour);
+	colour_s = gdk_color_to_string(&colour);
+
+	gconf_client_set_string(client, MSSH_GCONF_KEY_BG_COLOUR, colour_s,
+		NULL);
+}
+
 static void mssh_pref_init(MSSHPref* pref)
 {
 	GConfClient *client;
 	GConfEntry *entry;
 	GConfValue *value;
+	GdkVisual *visual = gdk_visual_get_system();
+	GdkColormap *colour_map = gdk_colormap_new(visual, TRUE);
+	GdkColor colour;
+	const gchar *colour_s;
 
 	GtkWidget *frame = gtk_vbox_new(FALSE, 5);
 	GtkWidget *notebook = gtk_notebook_new();
@@ -50,7 +84,7 @@ static void mssh_pref_init(MSSHPref* pref)
 	GtkWidget *colour_table = gtk_table_new(2, 2, FALSE);
 	GtkWidget *bg_colour_label = gtk_label_new("Background:");
 	GtkWidget *bg_colour_select = gtk_color_button_new();
-	GtkWidget *fg_colour_label = gtk_label_new("Forground:");
+	GtkWidget *fg_colour_label = gtk_label_new("Foreground:");
 	GtkWidget *fg_colour_select = gtk_color_button_new();
 
 	GtkWidget *exit_check = gtk_check_button_new_with_label(
@@ -126,6 +160,10 @@ static void mssh_pref_init(MSSHPref* pref)
 
 	g_signal_connect(G_OBJECT(font_select), "font-set",
 		G_CALLBACK(mssh_pref_font_select), NULL);
+	g_signal_connect(G_OBJECT(fg_colour_select), "color-set",
+		G_CALLBACK(mssh_pref_fg_colour_select), NULL);
+	g_signal_connect(G_OBJECT(bg_colour_select), "color-set",
+		G_CALLBACK(mssh_pref_bg_colour_select), NULL);
 
 	client = gconf_client_get_default();
 
@@ -134,6 +172,24 @@ static void mssh_pref_init(MSSHPref* pref)
 	value = gconf_entry_get_value(entry);
 	gtk_font_button_set_font_name(GTK_FONT_BUTTON(font_select),
 		gconf_value_get_string(value));
+
+	entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FG_COLOUR, NULL,
+		TRUE, NULL);
+	value = gconf_entry_get_value(entry);
+	colour_s = gconf_value_get_string(value);
+	gdk_colormap_alloc_color(colour_map, &colour, TRUE, TRUE);
+	gdk_color_parse(colour_s, &colour);
+	gtk_color_button_set_color(GTK_COLOR_BUTTON(fg_colour_select),
+		&colour);
+
+	entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BG_COLOUR, NULL,
+		TRUE, NULL);
+	value = gconf_entry_get_value(entry);
+	colour_s = gconf_value_get_string(value);
+	gdk_colormap_alloc_color(colour_map, &colour, TRUE, TRUE);
+	gdk_color_parse(colour_s, &colour);
+	gtk_color_button_set_color(GTK_COLOR_BUTTON(bg_colour_select),
+		&colour);
 }
 
 static void mssh_pref_class_init(MSSHPrefClass *klass)

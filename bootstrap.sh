@@ -104,16 +104,16 @@ aclocal || {
   echo "aclocal failed - check that all needed development files are present on system"
   exit 1
 }
-echo "+ running autoheader ... "
-autoheader || {
-  echo
-  echo "autoheader failed"
-  exit 1
-}
 echo "+ running autoconf ... "
 autoconf || {
   echo
   echo "autoconf failed"
+  exit 1
+}
+echo "+ running autoheader ... "
+autoheader || {
+  echo
+  echo "autoheader failed"
   exit 1
 }
 echo "+ running automake ... "
