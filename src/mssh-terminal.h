@@ -43,6 +43,7 @@ gboolean mssh_terminal_isactive(MSSHTerminal *terminal);
 void mssh_terminal_init_session(MSSHTerminal *terminal, char *hostname);
 void mssh_terminal_start_session(MSSHTerminal *terminal, char **env);
 void mssh_terminal_send_host(MSSHTerminal *terminal);
+void mssh_terminal_send_string(MSSHTerminal *terminal, gchar *string);
 void mssh_terminal_send_data(MSSHTerminal *terminal, GdkEventKey *event);
 
 G_END_DECLS

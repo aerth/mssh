@@ -61,6 +61,15 @@ void mssh_terminal_send_host(MSSHTerminal *terminal)
 	}
 }
 
+void mssh_terminal_send_string(MSSHTerminal *terminal, gchar *string)
+{
+	if(mssh_terminal_isactive(terminal))
+	{
+		vte_terminal_feed_child(VTE_TERMINAL(terminal),	string,
+			strlen(string));
+	}
+}
+
 void mssh_terminal_send_data(MSSHTerminal *terminal, GdkEventKey *event)
 {
 	gboolean dummy;

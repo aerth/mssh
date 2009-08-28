@@ -21,6 +21,8 @@ static void mssh_window_session_closed(MSSHTerminal *terminal,
 	gpointer data);
 static void mssh_window_session_focused(MSSHTerminal *terminal,
 	gpointer data);
+static void mssh_window_insert(GtkWidget *widget, gchar *new_text,
+	gint new_text_length, gint *position, gpointer data);
 static void mssh_window_relayout(MSSHWindow *window);
 static void mssh_window_add_session(MSSHWindow *window, char *hostname);
 static void mssh_window_init(MSSHWindow* window);
@@ -98,6 +100,22 @@ static void mssh_window_pref(GtkWidget *widget, gpointer data)
 		GTK_WIN_POS_CENTER_ON_PARENT);
 
 	gtk_widget_show_all(pref);
+}
+
+static void mssh_window_insert(GtkWidget *widget, gchar *new_text,
+	gint new_text_length, gint *position, gpointer data)
+{
+	int i;
+
+	MSSHWindow *window = MSSH_WINDOW(data);
+
+	for(i = 0; i < window->terminals->len; i++)
+	{
+		mssh_terminal_send_string(g_array_index(window->terminals,
+			MSSHTerminal*, i), new_text);
+	}
+
+	g_signal_stop_emission_by_name(G_OBJECT(widget), "insert-text");
 }
 
 static gboolean mssh_window_key_press(GtkWidget *widget,
@@ -294,6 +312,8 @@ static void mssh_window_init(MSSHWindow* window)
 
 	g_signal_connect(G_OBJECT(entry), "key-press-event",
 		G_CALLBACK(mssh_window_key_press), window);
+	g_signal_connect(G_OBJECT(entry), "insert-text",
+		G_CALLBACK(mssh_window_insert), window);
 	g_signal_connect(G_OBJECT(entry), "focus-in-event",
 		G_CALLBACK(mssh_window_entry_focused), window);
 
