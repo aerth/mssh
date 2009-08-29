@@ -88,7 +88,7 @@ static void mssh_pref_init(MSSHPref* pref)
 	GtkWidget *fg_colour_select = gtk_color_button_new();
 
 	GtkWidget *exit_check = gtk_check_button_new_with_label(
-		"Enable Ctrl+W quit shortcut");
+		"Quit after all sessions have ended");
 	GtkWidget *close_check = gtk_check_button_new_with_label(
 		"Close ended sessions");
 

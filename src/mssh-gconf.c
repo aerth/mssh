@@ -74,3 +74,25 @@ void mssh_gconf_notify_bg_colour(GConfClient *client, guint cnxn_id,
 			window->terminals, MSSHTerminal*, i)), &colour);
 	}
 }
+
+void mssh_gconf_notify_columns(GConfClient *client, guint cnxn_id,
+	GConfEntry *entry, gpointer data)
+{
+	GConfValue *value;
+	int columns;
+
+	MSSHWindow *window = MSSH_WINDOW(data);
+
+	value = gconf_entry_get_value(entry);
+	columns = gconf_value_get_int(value);
+
+	if(columns <= 0)
+	{
+		columns = 1;
+		gconf_client_set_int(client, MSSH_GCONF_KEY_COLUMNS, columns,
+			NULL);
+	}
+
+	window->columns = columns;
+	mssh_window_relayout(window);
+}

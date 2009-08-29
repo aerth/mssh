@@ -25,7 +25,6 @@ static void mssh_window_session_focused(MSSHTerminal *terminal,
 	gpointer data);
 static void mssh_window_insert(GtkWidget *widget, gchar *new_text,
 	gint new_text_length, gint *position, gpointer data);
-static void mssh_window_relayout(MSSHWindow *window);
 static void mssh_window_add_session(MSSHWindow *window, char *hostname);
 static void mssh_window_init(MSSHWindow* window);
 static void mssh_window_class_init(MSSHWindowClass *klass);
@@ -212,11 +211,11 @@ static void mssh_window_session_focused(MSSHTerminal *terminal,
 	free(title);
 }
 
-static void mssh_window_relayout(MSSHWindow *window)
+void mssh_window_relayout(MSSHWindow *window)
 {
 	GConfClient *client;
 	GConfEntry *entry;
-	int i, len = window->terminals->len;
+	int i, len = window->terminals->len, cols = window->columns;
 
 	for(i = 0; i < len; i++)
 	{
@@ -231,7 +230,8 @@ static void mssh_window_relayout(MSSHWindow *window)
 		}
 
 		gtk_table_attach(GTK_TABLE(window->table), GTK_WIDGET(terminal),
-			(i % 2), (i == len - 1) ? 2 : (i % 2) + 1, i / 2, (i / 2) + 1,
+			(i % cols), (i == len - 1) ? cols : (i % cols) + 1, i / cols,
+			(i / cols) + 1,
 			GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 1, 1);
 		g_object_unref(terminal);
 
@@ -244,7 +244,8 @@ static void mssh_window_relayout(MSSHWindow *window)
 
 	if(len > 0)
 	{
-		gtk_table_resize(GTK_TABLE(window->table), ((len + 1) / 2), 2);
+		gtk_table_resize(GTK_TABLE(window->table), ((len + 1) / cols),
+			cols);
 	}
 
 	client = gconf_client_get_default();
@@ -361,6 +362,10 @@ static void mssh_window_init(MSSHWindow* window)
 		mssh_gconf_notify_fg_colour, window, NULL, NULL);
 	gconf_client_notify_add(client, MSSH_GCONF_KEY_BG_COLOUR,
 		mssh_gconf_notify_bg_colour, window, NULL, NULL);
+	gconf_client_notify_add(client, MSSH_GCONF_KEY_COLUMNS,
+		mssh_gconf_notify_columns, window, NULL, NULL);
+
+	gconf_client_notify(client, MSSH_GCONF_KEY_COLUMNS);
 }
 
 void mssh_window_start_session(MSSHWindow* window, char **env, int nhosts,

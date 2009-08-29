@@ -33,5 +33,16 @@
                 <long>Background colour to use for all MSSH terminals</long>
             </locale>
         </schema>
+        <schema>
+            <key>/schemas/apps/mssh/coloums</key>
+            <applyto>/apps/mssh/columns</applyto>
+            <owner>mssh</owner>
+            <type>int</type>
+            <default>2</default>
+            <locale name="C">
+                <short>Terminal columns</short>
+                <long>Number of columns of tiled terminals</long>
+            </locale>
+        </schema>
     </schemalist>
 </gconfschemafile>
