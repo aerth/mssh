@@ -1,3 +1,35 @@
+2009-09-02  Bradley Smith  <brad@brad-smith.co.uk>
+
+	Bump version to 1.0.
+
+	Hook up the rest of the preferences dialog.
+
+	Hook up columns spin button.
+
+2009-08-29  Bradley Smith  <brad@brad-smith.co.uk>
+
+	Add beginnings of columns preference.
+
+	Hook up colour preferences.
+
+2009-08-28  Bradley Smith  <brad@brad-smith.co.uk>
+
+	Reduce spacing between terminals.
+
+	Add initial gconf stuff, and hook up font preference.
+
+	Catch pastes into GtkEntry.
+
+2009-08-27  Bradley Smith  <brad@brad-smith.co.uk>
+
+	Remove menu item on session close.
+
+	Fixes to terminal class and add "add session" menuitem.
+
+	Add preferences dialog.
+
+	Split out terminals into seperate clase and make layout more dynamic.
+
 2009-08-25  Bradley Smith  <brad@brad-smith.co.uk>
 
 	Bump version to 0.2.
