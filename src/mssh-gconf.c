@@ -96,3 +96,66 @@ void mssh_gconf_notify_columns(GConfClient *client, guint cnxn_id,
 	window->columns = columns;
 	mssh_window_relayout(window);
 }
+
+void mssh_gconf_notify_timeout(GConfClient *client, guint cnxn_id,
+	GConfEntry *entry, gpointer data)
+{
+	GConfValue *value;
+	int timeout;
+
+	MSSHWindow *window = MSSH_WINDOW(data);
+
+	value = gconf_entry_get_value(entry);
+	timeout = gconf_value_get_int(value);
+
+	if(timeout < 0)
+	{
+		timeout = 0;
+		gconf_client_set_int(client, MSSH_GCONF_KEY_TIMEOUT, timeout,
+			NULL);
+	}
+
+	window->timeout = timeout;
+	mssh_window_relayout(window);
+}
+
+void mssh_gconf_notify_close_ended(GConfClient *client, guint cnxn_id,
+	GConfEntry *entry, gpointer data)
+{
+	GConfValue *value;
+	gboolean close_ended;
+	int i;
+
+	MSSHWindow *window = MSSH_WINDOW(data);
+
+	value = gconf_entry_get_value(entry);
+	close_ended = gconf_value_get_bool(value);
+
+	window->close_ended_sessions = close_ended;
+
+	if(close_ended)
+	{
+		for(i = 0; i < window->terminals->len; i++)
+		{
+			MSSHTerminal *terminal = g_array_index(window->terminals,
+				MSSHTerminal*, i);
+
+			if(terminal->ended)
+			{
+				mssh_window_session_closed(terminal, window);
+			}
+		}
+	}
+}
+
+void mssh_gconf_notify_quit_all_ended(GConfClient *client, guint cnxn_id,
+	GConfEntry *entry, gpointer data)
+{
+	GConfValue *value;
+
+	MSSHWindow *window = MSSH_WINDOW(data);
+
+	value = gconf_entry_get_value(entry);
+
+	window->exit_on_all_closed = gconf_value_get_bool(value);
+}

@@ -75,6 +75,43 @@ static void mssh_pref_columns_select(GtkWidget *widget, gpointer data)
 	gconf_client_set_int(client, MSSH_GCONF_KEY_COLUMNS, columns, NULL);
 }
 
+static void mssh_pref_timeout_select(GtkWidget *widget, gpointer data)
+{
+	GConfClient *client;
+	int timeout;
+
+	client = gconf_client_get_default();
+
+	timeout = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(widget));
+
+	gconf_client_set_int(client, MSSH_GCONF_KEY_TIMEOUT, timeout, NULL);
+}
+
+static void mssh_pref_close_check(GtkWidget *widget, gpointer data)
+{
+	GConfClient *client;
+	gboolean close;
+
+	client = gconf_client_get_default();
+
+	close = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+
+	gconf_client_set_bool(client, MSSH_GCONF_KEY_CLOSE_ENDED, close, NULL);
+}
+
+static void mssh_pref_exit_check(GtkWidget *widget, gpointer data)
+{
+	GConfClient *client;
+	gboolean close;
+
+	client = gconf_client_get_default();
+
+	close = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+
+	gconf_client_set_bool(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED, close,
+		NULL);
+}
+
 static void mssh_pref_init(MSSHPref* pref)
 {
 	GConfClient *client;
@@ -178,6 +215,12 @@ static void mssh_pref_init(MSSHPref* pref)
 		G_CALLBACK(mssh_pref_bg_colour_select), NULL);
 	g_signal_connect(G_OBJECT(columns_select), "value-changed",
 		G_CALLBACK(mssh_pref_columns_select), NULL);
+	g_signal_connect(G_OBJECT(timeout_select), "value-changed",
+		G_CALLBACK(mssh_pref_timeout_select), NULL);
+	g_signal_connect(G_OBJECT(close_check), "toggled",
+		G_CALLBACK(mssh_pref_close_check), NULL);
+	g_signal_connect(G_OBJECT(exit_check), "toggled",
+		G_CALLBACK(mssh_pref_exit_check), NULL);
 
 	client = gconf_client_get_default();
 
@@ -210,6 +253,24 @@ static void mssh_pref_init(MSSHPref* pref)
 	value = gconf_entry_get_value(entry);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(columns_select),
 		gconf_value_get_int(value));
+
+	entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_TIMEOUT, NULL,
+		TRUE, NULL);
+	value = gconf_entry_get_value(entry);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(timeout_select),
+		gconf_value_get_int(value));
+
+	entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_CLOSE_ENDED,
+		NULL, TRUE, NULL);
+	value = gconf_entry_get_value(entry);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(close_check),
+		gconf_value_get_bool(value));
+
+	entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED,
+			NULL, TRUE, NULL);
+	value = gconf_entry_get_value(entry);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(exit_check),
+		gconf_value_get_bool(value));
 }
 
 static void mssh_pref_class_init(MSSHPrefClass *klass)

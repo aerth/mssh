@@ -4,6 +4,8 @@
 #include <gtk/gtk.h>
 #include <vte/vte.h>
 
+#include "mssh-terminal.h"
+
 G_BEGIN_DECLS
 
 #define MSSH_TYPE_WINDOW			mssh_window_get_type()
@@ -24,6 +26,9 @@ typedef struct
 	GArray *terminals;
 	char **env;
 	int columns;
+	int timeout;
+	gboolean close_ended_sessions;
+	gboolean exit_on_all_closed;
 } MSSHWindow;
 
 typedef struct
@@ -37,6 +42,7 @@ GtkWidget* mssh_window_new(void);
 void mssh_window_start_session(MSSHWindow* window, char **env, int nhosts,
 	char **servers);
 void mssh_window_relayout(MSSHWindow *window);
+void mssh_window_session_closed(MSSHTerminal *terminal, gpointer data);
 
 G_END_DECLS
 

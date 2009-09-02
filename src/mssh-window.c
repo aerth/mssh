@@ -19,8 +19,6 @@ static gboolean mssh_window_key_press(GtkWidget *widget,
 static gboolean mssh_window_entry_focused(GtkWidget *widget,
 	GtkDirectionType dir, gpointer data);
 static gboolean mssh_window_session_close(gpointer data);
-static void mssh_window_session_closed(MSSHTerminal *terminal,
-	gpointer data);
 static void mssh_window_session_focused(MSSHTerminal *terminal,
 	gpointer data);
 static void mssh_window_insert(GtkWidget *widget, gchar *new_text,
@@ -57,37 +55,7 @@ static void mssh_window_sendhost(GtkWidget *widget, gpointer data)
 
 static void mssh_window_destroy(GtkWidget *widget, gpointer data)
 {
-	int i;
-
-	MSSHWindow *window = MSSH_WINDOW(data);
-
-	if(window->terminals->len > 0)
-	{
-		GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(window),
-			GTK_DIALOG_DESTROY_WITH_PARENT,	GTK_MESSAGE_QUESTION,
-			GTK_BUTTONS_YES_NO, "%s, %s",
-			"You still have open sessions",
-			"are you sure you wish to quit?");
-
-		if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES)
-		{
-				for(i = 0; i < window->terminals->len; i++)
-				{
-					mssh_terminal_destroy(g_array_index(window->terminals,
-						MSSHTerminal*, i));
-				}
-
-				g_array_free(window->terminals, TRUE);
-
-				gtk_main_quit();
-		}
-
-		gtk_widget_destroy(dialog);
-	}
-	else
-	{
-		gtk_main_quit();
-	}
+	gtk_main_quit();
 }
 
 static void mssh_window_pref(GtkWidget *widget, gpointer data)
@@ -178,19 +146,28 @@ static gboolean mssh_window_session_close(gpointer data)
 		mssh_window_relayout(data_pair->window);
 	}
 
+	if(data_pair->window->terminals->len == 0 &&
+		data_pair->window->exit_on_all_closed)
+	{
+		mssh_window_destroy(NULL, (void*)data_pair->window);
+	}
+
 	free(data_pair);
 
 	return FALSE;
 }
 
-static void mssh_window_session_closed(MSSHTerminal *terminal,
-	gpointer data)
+void mssh_window_session_closed(MSSHTerminal *terminal, gpointer data)
 {
 	struct WinTermPair *data_pair = malloc(sizeof(struct WinTermPair));
 	data_pair->terminal = terminal;
 	data_pair->window = MSSH_WINDOW(data);
 
-	g_timeout_add_seconds(2, mssh_window_session_close, data_pair);
+	if(data_pair->window->close_ended_sessions)
+	{
+		g_timeout_add_seconds(data_pair->window->timeout,
+			mssh_window_session_close, data_pair);
+	}
 }
 
 static void mssh_window_session_focused(MSSHTerminal *terminal,
@@ -215,7 +192,9 @@ void mssh_window_relayout(MSSHWindow *window)
 {
 	GConfClient *client;
 	GConfEntry *entry;
-	int i, len = window->terminals->len, cols = window->columns;
+	int i, len = window->terminals->len;
+	int cols = (len < window->columns) ? len : window->columns;
+	int rows = (len + 0.5) / cols;
 
 	for(i = 0; i < len; i++)
 	{
@@ -244,8 +223,7 @@ void mssh_window_relayout(MSSHWindow *window)
 
 	if(len > 0)
 	{
-		gtk_table_resize(GTK_TABLE(window->table), ((len + 1) / cols),
-			cols);
+		gtk_table_resize(GTK_TABLE(window->table), rows, cols);
 	}
 
 	client = gconf_client_get_default();
@@ -284,7 +262,6 @@ static void mssh_window_init(MSSHWindow* window)
 {
 	GConfClient *client;
 
-	GtkAccelGroup *accel_group = gtk_accel_group_new();
 	GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
 	GtkWidget *entry = gtk_entry_new();
 
@@ -300,8 +277,8 @@ static void mssh_window_init(MSSHWindow* window)
 		GTK_STOCK_QUIT, NULL);
 	GtkWidget *file_sendhost = gtk_image_menu_item_new_with_label(
 		"Send hostname");
-	GtkWidget *file_add = gtk_image_menu_item_new_with_label(
-		"Add session");
+/*	GtkWidget *file_add = gtk_image_menu_item_new_with_label(
+		"Add session");*/
 
 	GtkWidget *edit_pref = gtk_image_menu_item_new_from_stock(
 		GTK_STOCK_PREFERENCES, NULL);
@@ -315,7 +292,7 @@ static void mssh_window_init(MSSHWindow* window)
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(server_item),
 		window->server_menu);
 
-	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_add);
+/*	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_add);*/
 	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_sendhost);
 	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_quit);
 	gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_pref);
@@ -325,9 +302,6 @@ static void mssh_window_init(MSSHWindow* window)
 		G_CALLBACK(mssh_window_destroy), window);
 	g_signal_connect(G_OBJECT(edit_pref), "activate",
 		G_CALLBACK(mssh_window_pref), window);
-	gtk_widget_add_accelerator(file_quit, "activate", accel_group,
-		GDK_W, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-	gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
 
 	gtk_menu_bar_append(GTK_MENU_BAR(menu_bar), file_item);
 	gtk_menu_bar_append(GTK_MENU_BAR(menu_bar), edit_item);
@@ -364,8 +338,17 @@ static void mssh_window_init(MSSHWindow* window)
 		mssh_gconf_notify_bg_colour, window, NULL, NULL);
 	gconf_client_notify_add(client, MSSH_GCONF_KEY_COLUMNS,
 		mssh_gconf_notify_columns, window, NULL, NULL);
+	gconf_client_notify_add(client, MSSH_GCONF_KEY_TIMEOUT,
+		mssh_gconf_notify_timeout, window, NULL, NULL);
+	gconf_client_notify_add(client, MSSH_GCONF_KEY_CLOSE_ENDED,
+		mssh_gconf_notify_close_ended, window, NULL, NULL);
+	gconf_client_notify_add(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED,
+		mssh_gconf_notify_quit_all_ended, window, NULL, NULL);
 
 	gconf_client_notify(client, MSSH_GCONF_KEY_COLUMNS);
+	gconf_client_notify(client, MSSH_GCONF_KEY_TIMEOUT);
+	gconf_client_notify(client, MSSH_GCONF_KEY_CLOSE_ENDED);
+	gconf_client_notify(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED);
 }
 
 void mssh_window_start_session(MSSHWindow* window, char **env, int nhosts,

@@ -83,6 +83,7 @@ void mssh_terminal_send_data(MSSHTerminal *terminal, GdkEventKey *event)
 static void mssh_terminal_init(MSSHTerminal* terminal)
 {
 	terminal->started = 0;
+	terminal->ended = 0;
 
 	g_signal_connect(G_OBJECT(terminal), "child-exited",
 		G_CALLBACK(mssh_terminal_child_exited), terminal);
@@ -108,6 +109,8 @@ static void mssh_terminal_child_exited(VteTerminal *vte, gpointer data)
 	char msg[] = "\r\n[Child Exited]\r\n";
 
 	MSSHTerminal *terminal = MSSH_TERMINAL(data);
+
+	terminal->ended = 1;
 
 	vte_terminal_feed(vte, msg, strlen(msg));
 

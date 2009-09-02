@@ -44,5 +44,39 @@
                 <long>Number of columns of tiled terminals</long>
             </locale>
         </schema>
+        <schema>
+            <key>/schemas/apps/mssh/timeout</key>
+            <applyto>/apps/mssh/timeout</applyto>
+            <owner>mssh</owner>
+            <type>int</type>
+            <default>2</default>
+            <locale name="C">
+                <short>Terminal close timeout</short>
+                <long>Timeout after which to close ended sessions</long>
+            </locale>
+        </schema>
+        <schema>
+            <key>/schemas/apps/mssh/close_ended</key>
+            <applyto>/apps/mssh/close_ended</applyto>
+            <owner>mssh</owner>
+            <type>bool</type>
+            <default>true</default>
+            <locale name="C">
+                <short>Close ended sessions</short>
+                <long>Close ended ssh sessions</long>
+            </locale>
+        </schema>
+        <schema>
+            <key>/schemas/apps/mssh/quit_all_ended</key>
+            <applyto>/apps/mssh/quit_all_ended</applyto>
+            <owner>mssh</owner>
+            <type>bool</type>
+            <default>false</default>
+            <locale name="C">
+                <short>Quit after all sessions ended</short>
+                <long>Quit MSSH when all ssh sessions have ended</long>
+            </locale>
+        </schema>
+
     </schemalist>
 </gconfschemafile>

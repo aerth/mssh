@@ -22,6 +22,7 @@ typedef struct
 	GtkWidget *menu_item;
 	char *hostname;
 	int started;
+	int ended;
 } MSSHTerminal;
 
 typedef struct
