@@ -1,6 +1,6 @@
 SUBDIRS = src
 
-EXTRA_DIST = mssh.schemas
+EXTRA_DIST = mssh.schemas mssh_clusters.conf
 
 SCHEMAS_FILE = mssh.schemas
 

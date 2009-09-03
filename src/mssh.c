@@ -8,6 +8,7 @@
 #include "config.h"
 #include "mssh-window.h"
 
+#define CONFFILE	".mssh_clusters"
 #define PKGINFO		PACKAGE_NAME " " VERSION
 #define COPYRIGHT	"Copyright (C) 2009 Bradley Smith <brad@brad-smith.co.uk>"
 
@@ -22,38 +23,188 @@ void usage(const char *argv0)
 	fprintf(stderr, "%s\n", PKGINFO);
 	fprintf(stderr, "%s\n", COPYRIGHT);
 	fprintf(stderr, "An ssh client to issue the same commands to multiple servers\n\n");
-	fprintf(stderr, "Usage: %s [OPTION]... [HOSTS]\n\n", argv0);
+	fprintf(stderr, "Usage: %s [OPTION]... (-a ALIAS | HOSTS)\n\n",
+		argv0);
 	fprintf(stderr,
-		"  -h, --help       Display this help and exit\n");
+		"  -a, --alias=ALIAS    Open hosts associated with named alias\n");
 	fprintf(stderr,
-		"  -V, --version    Output version information and exit\n");
+		"  -h, --help           Display this help and exit\n");
+	fprintf(stderr,
+		"  -V, --version        Output version information and exit\n");
 	fprintf(stderr, "\nReport bugs to <%s>.\n", PACKAGE_BUGREPORT);
 	exit(EXIT_FAILURE);
+}
+
+static char *fgetline(FILE *stream)
+{
+    size_t len = 64;
+    size_t pos = 0;
+    char c;
+    char *buf;
+
+    if((buf = malloc(len)) == NULL)
+    {
+        perror("malloc");
+		exit(EXIT_FAILURE);
+    }
+
+    while((c = fgetc(stream)) != EOF)
+    {
+        if(pos >= len)
+        {
+            len *= 2;
+            if((buf = realloc(buf, len)) == NULL)
+            {
+                perror("realloc");
+				exit(EXIT_FAILURE);
+            }
+        }
+        if(c == '\n')
+        {
+            buf[pos++] = '\0';
+            break;
+        }
+        else
+        {
+            buf[pos++] = c;
+        }
+    }
+
+	if(c == EOF)
+	{
+		free(buf);
+		return NULL;
+	}
+
+    return buf;
+}
+
+void append_alias(char *alias, GArray *hosts, GData **aliases, int lineno)
+{
+	int i;
+	GArray *fetched;
+
+	if((fetched = g_datalist_get_data(aliases, alias)) == NULL)
+	{
+		printf("Line %d: Alias '%s' not defined\n", lineno, alias);
+		exit(EXIT_FAILURE);
+	}
+
+	for(i = 0; i < fetched->len; i++)
+	{
+		g_array_append_val(hosts, g_array_index(fetched, char*, i));
+	}
+}
+
+GData **parse_aliases(char *conffile)
+{
+	FILE *file;
+	char *line;
+	int lineno = 0;
+
+	GData **aliases = malloc(sizeof(GData*));
+	g_datalist_init(aliases);
+
+	if((file = fopen(conffile, "r")) == NULL)
+		return aliases;
+
+	while((line = fgetline(file)) != NULL)
+	{
+		char *sep, *alias, *hoststr, *tmp;
+		GArray *hosts;
+
+		lineno++;
+
+		if(strcmp(line, "") == 0)
+			continue;
+
+		if((sep = strchr(line, ':')) == NULL)
+		{
+			printf("Line %d: Failed to parse line '%s'\n", lineno, line);
+			exit(EXIT_FAILURE);
+		}
+
+		*sep = '\0';
+		alias = line;
+		hoststr = sep + 1;
+
+		if((tmp = strtok(hoststr, " ")) == NULL)
+		{
+			printf("Line %d: Alias '%s' specifies no hosts\n", lineno,
+				alias);
+			exit(EXIT_FAILURE);
+		}
+
+		hosts = g_array_new(FALSE, TRUE, sizeof(char*));
+
+		do
+		{
+			if(tmp[0] == '[' && tmp[strlen(tmp) - 1] == ']')
+			{
+				tmp++;
+				tmp[strlen(tmp) - 1] = '\0';
+				append_alias(tmp, hosts, aliases, lineno);
+			}
+			else
+				g_array_append_val(hosts, tmp);
+		}
+		while((tmp = strtok(NULL, " ")) != NULL);
+
+		g_datalist_set_data(aliases, alias, hosts);
+	}
+
+	return aliases;
 }
 
 int main(int argc, char* argv[], char* env[])
 {
 	GtkWidget* window;
 	int c, option_index = 0;
-	int i, nhosts = 0;
-	char **hosts = NULL;
+	char *home, *conffile;
+	GData **aliases = NULL;
+	GArray *hosts = NULL;
 
 	static struct option long_options[] =
 	{
-		{"help",	no_argument,	0, 'h'},
-		{"version",	no_argument,	0, 'V'},
+		{"alias",	required_argument,	0, 'a'},
+		{"help",	no_argument,		0, 'h'},
+		{"version",	no_argument,		0, 'V'},
 		{0, 0, 0, 0}
 	};
 
+	if((home = getenv("HOME")) != NULL)
+	{
+		int len = strlen(home) + strlen(CONFFILE) + 2;
+
+		conffile = malloc(len);
+		snprintf(conffile, len, "%s/%s", home, CONFFILE);
+
+		aliases = parse_aliases(conffile);
+		free(conffile);
+	}
+	else
+	{
+		fprintf(stderr,
+			"Warning: $HOME not set, not reading config file\n");
+	}
+
 	for(;;)
 	{
-		c = getopt_long(argc, argv, "hV", long_options, &option_index);
+		c = getopt_long(argc, argv, "a:hV", long_options, &option_index);
 
 		if(c == -1)
 			break;
 
 		switch(c)
 		{
+		case 'a':
+			if(aliases && (hosts = g_datalist_get_data(aliases,
+				optarg)) == NULL)
+			{
+				fprintf(stderr, "Alias '%s' not found\n", optarg);
+				usage(argv[0]);
+			}
+			break;
 		case 'h':
 			usage(argv[0]);
 			break;
@@ -95,18 +246,22 @@ int main(int argc, char* argv[], char* env[])
 		}
 	}
 
-	if (optind < argc)
+	if(hosts == NULL)
 	{
-		hosts = malloc(sizeof(char*) * (argc - optind));
-		while (optind < argc)
+		hosts = g_array_new(FALSE, TRUE, sizeof(char*));
+		if (optind < argc)
 		{
-			hosts[nhosts++] = strdup(argv[optind++]);
+			while (optind < argc)
+			{
+				char *host = strdup(argv[optind++]);
+				g_array_append_val(hosts, host);
+			}
 		}
-	}
-	else
-	{
-		fprintf(stderr, "No hosts specified\n\n");
-		usage(argv[0]);
+		else
+		{
+			fprintf(stderr, "No hosts specified\n\n");
+			usage(argv[0]);
+		}
 	}
 
 	gtk_init(&argc, &argv);
@@ -116,15 +271,10 @@ int main(int argc, char* argv[], char* env[])
 	g_signal_connect(G_OBJECT(window), "destroy",
 		G_CALLBACK(on_mssh_destroy), NULL);
 
-	mssh_window_start_session(MSSH_WINDOW(window), env, nhosts, hosts);
+	mssh_window_start_session(MSSH_WINDOW(window), env, hosts);
 
 	gtk_widget_show_all(window);
 	gtk_main();
-
-	for(i = 0; i < nhosts; i++)
-		free(hosts[i]);
-
-	free(hosts);
 
 	return 0;
 }

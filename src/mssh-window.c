@@ -351,10 +351,11 @@ static void mssh_window_init(MSSHWindow* window)
 	gconf_client_notify(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED);
 }
 
-void mssh_window_start_session(MSSHWindow* window, char **env, int nhosts,
-	char **servers)
+void mssh_window_start_session(MSSHWindow* window, char **env,
+	GArray *hosts)
 {
 	int i, j, k;
+	int nhosts = hosts->len;
 	int rows = (nhosts / 2) + (nhosts % 2);
 
 	window->env = env;
@@ -366,7 +367,8 @@ void mssh_window_start_session(MSSHWindow* window, char **env, int nhosts,
 			k = j + i*2;
 			if(k < nhosts)
 			{
-				mssh_window_add_session(window, servers[k]);
+				mssh_window_add_session(window, g_array_index(hosts,
+					char*, k));
 			}
 		}
 	}

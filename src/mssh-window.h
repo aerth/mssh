@@ -39,8 +39,8 @@ typedef struct
 GType mssh_window_get_type(void) G_GNUC_CONST;
 
 GtkWidget* mssh_window_new(void);
-void mssh_window_start_session(MSSHWindow* window, char **env, int nhosts,
-	char **servers);
+void mssh_window_start_session(MSSHWindow* window, char **env,
+	GArray *hosts);
 void mssh_window_relayout(MSSHWindow *window);
 void mssh_window_session_closed(MSSHTerminal *terminal, gpointer data);
 
