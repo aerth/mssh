@@ -26,6 +26,7 @@ typedef struct
 	GArray *terminals;
 	char **env;
 	int columns;
+	int columns_override;
 	int timeout;
 	gboolean close_ended_sessions;
 	gboolean exit_on_all_closed;
@@ -40,7 +41,7 @@ GType mssh_window_get_type(void) G_GNUC_CONST;
 
 GtkWidget* mssh_window_new(void);
 void mssh_window_start_session(MSSHWindow* window, char **env,
-	GArray *hosts);
+	GArray *hosts, long cols);
 void mssh_window_relayout(MSSHWindow *window);
 void mssh_window_session_closed(MSSHTerminal *terminal, gpointer data);
 

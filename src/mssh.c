@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
+#include <errno.h>
 
 #include <gtk/gtk.h>
 
@@ -27,6 +28,8 @@ void usage(const char *argv0)
 		argv0);
 	fprintf(stderr,
 		"  -a, --alias=ALIAS    Open hosts associated with named alias\n");
+    fprintf(stderr,
+        "  -c, --columns=NUM    Override gconf for number of columns\n");
 	fprintf(stderr,
 		"  -h, --help           Display this help and exit\n");
 	fprintf(stderr,
@@ -161,12 +164,14 @@ int main(int argc, char* argv[], char* env[])
 	GtkWidget* window;
 	int c, option_index = 0;
 	char *home, *conffile;
+    long cols = 0;
 	GData **aliases = NULL;
 	GArray *hosts = NULL;
 
 	static struct option long_options[] =
 	{
 		{"alias",	required_argument,	0, 'a'},
+		{"columns",	required_argument,	0, 'c'},
 		{"help",	no_argument,		0, 'h'},
 		{"version",	no_argument,		0, 'V'},
 		{0, 0, 0, 0}
@@ -190,7 +195,7 @@ int main(int argc, char* argv[], char* env[])
 
 	for(;;)
 	{
-		c = getopt_long(argc, argv, "a:hV", long_options, &option_index);
+		c = getopt_long(argc, argv, "a:c:hV", long_options, &option_index);
 
 		if(c == -1)
 			break;
@@ -201,10 +206,20 @@ int main(int argc, char* argv[], char* env[])
 			if(aliases && (hosts = g_datalist_get_data(aliases,
 				optarg)) == NULL)
 			{
-				fprintf(stderr, "Alias '%s' not found\n", optarg);
+				fprintf(stderr, "Alias '%s' not found\n\n", optarg);
 				usage(argv[0]);
 			}
 			break;
+        case 'c':
+            errno = 0;
+            cols = strtol(optarg, NULL, 10);
+            if(cols <= 0 || errno != 0)
+            {
+				fprintf(stderr, "Invalid number of columns '%s'\n\n",
+                    optarg);
+				usage(argv[0]);
+            }
+            break;
 		case 'h':
 			usage(argv[0]);
 			break;
@@ -271,7 +286,7 @@ int main(int argc, char* argv[], char* env[])
 	g_signal_connect(G_OBJECT(window), "destroy",
 		G_CALLBACK(on_mssh_destroy), NULL);
 
-	mssh_window_start_session(MSSH_WINDOW(window), env, hosts);
+	mssh_window_start_session(MSSH_WINDOW(window), env, hosts, cols);
 
 	gtk_widget_show_all(window);
 	gtk_main();

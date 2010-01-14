@@ -193,7 +193,9 @@ void mssh_window_relayout(MSSHWindow *window)
 	GConfClient *client;
 	GConfEntry *entry;
 	int i, len = window->terminals->len;
-	int cols = (len < window->columns) ? len : window->columns;
+    int wcols = window->columns_override ? window->columns_override :
+        window->columns;
+	int cols = (len < wcols) ? len : wcols;
 	int rows = (len + 0.5) / cols;
 
 	for(i = 0; i < len; i++)
@@ -352,13 +354,14 @@ static void mssh_window_init(MSSHWindow* window)
 }
 
 void mssh_window_start_session(MSSHWindow* window, char **env,
-	GArray *hosts)
+	GArray *hosts, long cols)
 {
 	int i, j, k;
 	int nhosts = hosts->len;
 	int rows = (nhosts / 2) + (nhosts % 2);
 
 	window->env = env;
+    window->columns_override = cols;
 
 	for(i = 0; i < rows; i++)
 	{
