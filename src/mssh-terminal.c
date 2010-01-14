@@ -85,6 +85,9 @@ static void mssh_terminal_init(MSSHTerminal* terminal)
     terminal->started = 0;
     terminal->ended = 0;
 
+    vte_terminal_set_word_chars(VTE_TERMINAL(terminal),
+        "-A-Za-z0-9,./?%&#:_=+@~");
+
     g_signal_connect(G_OBJECT(terminal), "child-exited",
         G_CALLBACK(mssh_terminal_child_exited), terminal);
     g_signal_connect(G_OBJECT(terminal), "focus-in-event",
