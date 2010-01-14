@@ -5,157 +5,157 @@
 #include "mssh-terminal.h"
 
 void mssh_gconf_notify_font(GConfClient *client, guint cnxn_id,
-	GConfEntry *entry, gpointer data)
+    GConfEntry *entry, gpointer data)
 {
-	GConfValue *value;
-	const gchar *font;
-	int i;
+    GConfValue *value;
+    const gchar *font;
+    int i;
 
-	MSSHWindow *window = MSSH_WINDOW(data);
+    MSSHWindow *window = MSSH_WINDOW(data);
 
-	value = gconf_entry_get_value(entry);
-	font = gconf_value_get_string(value);
+    value = gconf_entry_get_value(entry);
+    font = gconf_value_get_string(value);
 
-	for(i = 0; i < window->terminals->len; i++)
-	{
-		vte_terminal_set_font_from_string(VTE_TERMINAL(g_array_index(
-			window->terminals, MSSHTerminal*, i)), font);
-	}
+    for(i = 0; i < window->terminals->len; i++)
+    {
+        vte_terminal_set_font_from_string(VTE_TERMINAL(g_array_index(
+            window->terminals, MSSHTerminal*, i)), font);
+    }
 }
 
 void mssh_gconf_notify_fg_colour(GConfClient *client, guint cnxn_id,
-	GConfEntry *entry, gpointer data)
+    GConfEntry *entry, gpointer data)
 {
-	GConfValue *value;
-	const gchar *colour_s;
-	GdkVisual *visual = gdk_visual_get_system();
-	GdkColormap *colour_map;
-	GdkColor colour;
-	int i;
+    GConfValue *value;
+    const gchar *colour_s;
+    GdkVisual *visual = gdk_visual_get_system();
+    GdkColormap *colour_map;
+    GdkColor colour;
+    int i;
 
-	MSSHWindow *window = MSSH_WINDOW(data);
+    MSSHWindow *window = MSSH_WINDOW(data);
 
-	value = gconf_entry_get_value(entry);
-	colour_s = gconf_value_get_string(value);
-	colour_map = gdk_colormap_new(visual, TRUE);
-	gdk_colormap_alloc_color(colour_map, &colour, TRUE, TRUE);
+    value = gconf_entry_get_value(entry);
+    colour_s = gconf_value_get_string(value);
+    colour_map = gdk_colormap_new(visual, TRUE);
+    gdk_colormap_alloc_color(colour_map, &colour, TRUE, TRUE);
 
-	gdk_color_parse(colour_s, &colour);
+    gdk_color_parse(colour_s, &colour);
 
-	for(i = 0; i < window->terminals->len; i++)
-	{
-		vte_terminal_set_color_foreground(VTE_TERMINAL(g_array_index(
-			window->terminals, MSSHTerminal*, i)), &colour);
-	}
+    for(i = 0; i < window->terminals->len; i++)
+    {
+        vte_terminal_set_color_foreground(VTE_TERMINAL(g_array_index(
+            window->terminals, MSSHTerminal*, i)), &colour);
+    }
 }
 
 void mssh_gconf_notify_bg_colour(GConfClient *client, guint cnxn_id,
-	GConfEntry *entry, gpointer data)
+    GConfEntry *entry, gpointer data)
 {
-	GConfValue *value;
-	const gchar *colour_s;
-	GdkVisual *visual = gdk_visual_get_system();
-	GdkColormap *colour_map;
-	GdkColor colour;
-	int i;
+    GConfValue *value;
+    const gchar *colour_s;
+    GdkVisual *visual = gdk_visual_get_system();
+    GdkColormap *colour_map;
+    GdkColor colour;
+    int i;
 
-	MSSHWindow *window = MSSH_WINDOW(data);
+    MSSHWindow *window = MSSH_WINDOW(data);
 
-	value = gconf_entry_get_value(entry);
-	colour_s = gconf_value_get_string(value);
-	colour_map = gdk_colormap_new(visual, TRUE);
-	gdk_colormap_alloc_color(colour_map, &colour, TRUE, TRUE);
+    value = gconf_entry_get_value(entry);
+    colour_s = gconf_value_get_string(value);
+    colour_map = gdk_colormap_new(visual, TRUE);
+    gdk_colormap_alloc_color(colour_map, &colour, TRUE, TRUE);
 
-	gdk_color_parse(colour_s, &colour);
+    gdk_color_parse(colour_s, &colour);
 
-	for(i = 0; i < window->terminals->len; i++)
-	{
-		vte_terminal_set_color_background(VTE_TERMINAL(g_array_index(
-			window->terminals, MSSHTerminal*, i)), &colour);
-	}
+    for(i = 0; i < window->terminals->len; i++)
+    {
+        vte_terminal_set_color_background(VTE_TERMINAL(g_array_index(
+            window->terminals, MSSHTerminal*, i)), &colour);
+    }
 }
 
 void mssh_gconf_notify_columns(GConfClient *client, guint cnxn_id,
-	GConfEntry *entry, gpointer data)
+    GConfEntry *entry, gpointer data)
 {
-	GConfValue *value;
-	int columns;
+    GConfValue *value;
+    int columns;
 
-	MSSHWindow *window = MSSH_WINDOW(data);
+    MSSHWindow *window = MSSH_WINDOW(data);
 
-	value = gconf_entry_get_value(entry);
-	columns = gconf_value_get_int(value);
+    value = gconf_entry_get_value(entry);
+    columns = gconf_value_get_int(value);
 
-	if(columns <= 0)
-	{
-		columns = 1;
-		gconf_client_set_int(client, MSSH_GCONF_KEY_COLUMNS, columns,
-			NULL);
-	}
+    if(columns <= 0)
+    {
+        columns = 1;
+        gconf_client_set_int(client, MSSH_GCONF_KEY_COLUMNS, columns,
+            NULL);
+    }
 
-	window->columns = columns;
-	mssh_window_relayout(window);
+    window->columns = columns;
+    mssh_window_relayout(window);
 }
 
 void mssh_gconf_notify_timeout(GConfClient *client, guint cnxn_id,
-	GConfEntry *entry, gpointer data)
+    GConfEntry *entry, gpointer data)
 {
-	GConfValue *value;
-	int timeout;
+    GConfValue *value;
+    int timeout;
 
-	MSSHWindow *window = MSSH_WINDOW(data);
+    MSSHWindow *window = MSSH_WINDOW(data);
 
-	value = gconf_entry_get_value(entry);
-	timeout = gconf_value_get_int(value);
+    value = gconf_entry_get_value(entry);
+    timeout = gconf_value_get_int(value);
 
-	if(timeout < 0)
-	{
-		timeout = 0;
-		gconf_client_set_int(client, MSSH_GCONF_KEY_TIMEOUT, timeout,
-			NULL);
-	}
+    if(timeout < 0)
+    {
+        timeout = 0;
+        gconf_client_set_int(client, MSSH_GCONF_KEY_TIMEOUT, timeout,
+            NULL);
+    }
 
-	window->timeout = timeout;
-	mssh_window_relayout(window);
+    window->timeout = timeout;
+    mssh_window_relayout(window);
 }
 
 void mssh_gconf_notify_close_ended(GConfClient *client, guint cnxn_id,
-	GConfEntry *entry, gpointer data)
+    GConfEntry *entry, gpointer data)
 {
-	GConfValue *value;
-	gboolean close_ended;
-	int i;
+    GConfValue *value;
+    gboolean close_ended;
+    int i;
 
-	MSSHWindow *window = MSSH_WINDOW(data);
+    MSSHWindow *window = MSSH_WINDOW(data);
 
-	value = gconf_entry_get_value(entry);
-	close_ended = gconf_value_get_bool(value);
+    value = gconf_entry_get_value(entry);
+    close_ended = gconf_value_get_bool(value);
 
-	window->close_ended_sessions = close_ended;
+    window->close_ended_sessions = close_ended;
 
-	if(close_ended)
-	{
-		for(i = 0; i < window->terminals->len; i++)
-		{
-			MSSHTerminal *terminal = g_array_index(window->terminals,
-				MSSHTerminal*, i);
+    if(close_ended)
+    {
+        for(i = 0; i < window->terminals->len; i++)
+        {
+            MSSHTerminal *terminal = g_array_index(window->terminals,
+                MSSHTerminal*, i);
 
-			if(terminal->ended)
-			{
-				mssh_window_session_closed(terminal, window);
-			}
-		}
-	}
+            if(terminal->ended)
+            {
+                mssh_window_session_closed(terminal, window);
+            }
+        }
+    }
 }
 
 void mssh_gconf_notify_quit_all_ended(GConfClient *client, guint cnxn_id,
-	GConfEntry *entry, gpointer data)
+    GConfEntry *entry, gpointer data)
 {
-	GConfValue *value;
+    GConfValue *value;
 
-	MSSHWindow *window = MSSH_WINDOW(data);
+    MSSHWindow *window = MSSH_WINDOW(data);
 
-	value = gconf_entry_get_value(entry);
+    value = gconf_entry_get_value(entry);
 
-	window->exit_on_all_closed = gconf_value_get_bool(value);
+    window->exit_on_all_closed = gconf_value_get_bool(value);
 }

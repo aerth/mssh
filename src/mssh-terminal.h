@@ -6,34 +6,34 @@
 
 G_BEGIN_DECLS
 
-#define MSSH_TYPE_TERMINAL				mssh_terminal_get_type()
-#define MSSH_TERMINAL(obj)				G_TYPE_CHECK_INSTANCE_CAST(obj, \
-	MSSH_TYPE_TERMINAL, MSSHTerminal)
-#define MSSH_TERMINAL_CLASS(klass)		G_TYPE_CHECK_CLASS_CAST(klass, \
-	MSSH_TERMINAL_TYPE, MSSHTerminalClass)
-#define IS_MSSH_TERMINAL(obj)			G_TYPE_CHECK_INSTANCE_TYPE(obj, \
-	MSSH_TYPE_TERMINAL)
-#define IS_MSSH_TERMINAL_CLASS(klass)	G_TYPE_CHECK_CLASS_TYPE(klass, \
-	MSSH_TYPE_TERMINAL)
+#define MSSH_TYPE_TERMINAL              mssh_terminal_get_type()
+#define MSSH_TERMINAL(obj)              G_TYPE_CHECK_INSTANCE_CAST(obj, \
+    MSSH_TYPE_TERMINAL, MSSHTerminal)
+#define MSSH_TERMINAL_CLASS(klass)      G_TYPE_CHECK_CLASS_CAST(klass, \
+    MSSH_TERMINAL_TYPE, MSSHTerminalClass)
+#define IS_MSSH_TERMINAL(obj)           G_TYPE_CHECK_INSTANCE_TYPE(obj, \
+    MSSH_TYPE_TERMINAL)
+#define IS_MSSH_TERMINAL_CLASS(klass)   G_TYPE_CHECK_CLASS_TYPE(klass, \
+    MSSH_TYPE_TERMINAL)
 
 typedef struct
 {
-	VteTerminal vte;
-	GtkWidget *menu_item;
-	char *hostname;
-	int started;
-	int ended;
+    VteTerminal vte;
+    GtkWidget *menu_item;
+    char *hostname;
+    int started;
+    int ended;
 } MSSHTerminal;
 
 typedef struct
 {
-	VteTerminalClass parent_class;
+    VteTerminalClass parent_class;
 
-	guint session_closed_signal;
-	guint session_focused_signal;
+    guint session_closed_signal;
+    guint session_focused_signal;
 
-	void (*session_closed)(MSSHTerminal *terminal);
-	void (*session_focused)(MSSHTerminal *terminal);
+    void (*session_closed)(MSSHTerminal *terminal);
+    void (*session_focused)(MSSHTerminal *terminal);
 } MSSHTerminalClass;
 
 GType mssh_terminal_get_type(void) G_GNUC_CONST;

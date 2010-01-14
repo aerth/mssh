@@ -5,24 +5,24 @@
 
 G_BEGIN_DECLS
 
-#define MSSH_TYPE_PREF				mssh_pref_get_type()
-#define MSSH_PREF(obj)				G_TYPE_CHECK_INSTANCE_CAST(obj,\
-	MSSH_TYPE_PREF, MSSHPref)
-#define MSSH_PREF_CLASS(klass)		G_TYPE_CHECK_CLASS_CAST(klass,\
-	MSSH_PREF_TYPE, MSSHPrefClass)
-#define IS_MSSH_PREF(obj)			G_TYPE_CHECK_INSTANCE_TYPE(obj,\
-	MSSH_TYPE_PREF)
+#define MSSH_TYPE_PREF              mssh_pref_get_type()
+#define MSSH_PREF(obj)              G_TYPE_CHECK_INSTANCE_CAST(obj,\
+    MSSH_TYPE_PREF, MSSHPref)
+#define MSSH_PREF_CLASS(klass)      G_TYPE_CHECK_CLASS_CAST(klass,\
+    MSSH_PREF_TYPE, MSSHPrefClass)
+#define IS_MSSH_PREF(obj)           G_TYPE_CHECK_INSTANCE_TYPE(obj,\
+    MSSH_TYPE_PREF)
 #define IS_MSSH_PREF_CLASS(klass) G_TYPE_CHECK_CLASS_TYPE(klass,\
-	MSSH_TYPE_PREF)
+    MSSH_TYPE_PREF)
 
 typedef struct
 {
-	GtkWindow widget;
+    GtkWindow widget;
 } MSSHPref;
 
 typedef struct
 {
-	GtkWindowClass parent_class;
+    GtkWindowClass parent_class;
 } MSSHPrefClass;
 
 GType mssh_pref_get_type(void) G_GNUC_CONST;
