@@ -192,11 +192,17 @@ void mssh_window_relayout(MSSHWindow *window)
 {
     GConfClient *client;
     GConfEntry *entry;
+    GtkWidget *focus;
     int i, len = window->terminals->len;
     int wcols = window->columns_override ? window->columns_override :
         window->columns;
     int cols = (len < wcols) ? len : wcols;
     int rows = (len + 0.5) / cols;
+
+    focus = gtk_window_get_focus(GTK_WINDOW(window));
+
+    if(!focus)
+        focus = window->global_entry;
 
     for(i = 0; i < len; i++)
     {
@@ -241,6 +247,8 @@ void mssh_window_relayout(MSSHWindow *window)
     entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BG_COLOUR, NULL,
         TRUE, NULL);
     mssh_gconf_notify_bg_colour(client, 0, entry, window);
+
+    gtk_window_set_focus(GTK_WINDOW(window), GTK_WIDGET(focus));
 }
 
 static void mssh_window_add_session(MSSHWindow *window, char *hostname)
@@ -286,6 +294,8 @@ static void mssh_window_init(MSSHWindow* window)
         GTK_STOCK_PREFERENCES, NULL);
 
     window->server_menu = gtk_menu_new();
+
+    window->global_entry = entry;
 
     window->terminals = g_array_new(FALSE, TRUE, sizeof(MSSHTerminal*));
 

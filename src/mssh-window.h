@@ -23,6 +23,7 @@ typedef struct
     GtkWindow widget;
     GtkWidget *table;
     GtkWidget *server_menu;
+    GtkWidget *global_entry;
     GArray *terminals;
     char **env;
     int columns;
