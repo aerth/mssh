@@ -159,3 +159,15 @@ void mssh_gconf_notify_quit_all_ended(GConfClient *client, guint cnxn_id,
 
     window->exit_on_all_closed = gconf_value_get_bool(value);
 }
+
+void mssh_gconf_notify_modifier(GConfClient *client, guint cnxn_id,
+    GConfEntry *entry, gpointer data)
+{
+    GConfValue *value;
+
+    MSSHWindow *window = MSSH_WINDOW(data);
+
+    value = gconf_entry_get_value(entry);
+
+    window->modifier = gconf_value_get_int(value);
+}

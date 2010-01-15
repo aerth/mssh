@@ -113,6 +113,72 @@ static gboolean mssh_window_entry_focused(GtkWidget *widget,
     return FALSE;
 }
 
+static gboolean mssh_window_focus(GtkWidget *widget,
+    GObject *acceleratable, guint keyval, GdkModifierType modifier,
+    gpointer data)
+{
+    MSSHWindow *window = MSSH_WINDOW(data);
+    GtkWidget *focus;
+
+    int i, idx = -1, len = window->terminals->len;
+    int wcols = window->columns_override ? window->columns_override :
+        window->columns;
+    int cols = (len < wcols) ? len : wcols;
+
+    focus = gtk_window_get_focus(GTK_WINDOW(window));
+
+    for(i = 0; i < len; i++)
+    {
+        if(focus == GTK_WIDGET(g_array_index(window->terminals,
+            MSSHTerminal*, i)))
+        {
+            idx = i;
+            break;
+        }
+    }
+
+    if(focus == window->global_entry && keyval == GDK_Down)
+        idx = 0;
+    else if(idx == -1)
+        return FALSE;
+    else
+    {
+        switch(keyval)
+        {
+        case GDK_Up:
+            idx = idx - cols;
+            break;
+        case GDK_Down:
+            if((idx + cols >= len) && (idx < len -
+                (len % cols) ? (len % cols) : cols))
+                idx = len - 1;
+            else
+                idx = idx + cols;
+            break;
+        case GDK_Left:
+            if(idx % cols != 0)
+                idx = idx - 1;
+            break;
+        case GDK_Right:
+            if(idx % cols != cols - 1)
+                idx = idx + 1;
+            break;
+        }
+    }
+
+    if(idx < 0)
+        focus = window->global_entry;
+    else if(idx < len)
+    {
+        focus = GTK_WIDGET(g_array_index(window->terminals,
+            MSSHTerminal*, idx));
+    }
+
+    gtk_window_set_focus(GTK_WINDOW(window), focus);
+
+    return TRUE;
+}
+
 static gboolean mssh_window_session_close(gpointer data)
 {
     int i, idx = -1;
@@ -293,6 +359,8 @@ static void mssh_window_init(MSSHWindow* window)
     GtkWidget *edit_pref = gtk_image_menu_item_new_from_stock(
         GTK_STOCK_PREFERENCES, NULL);
 
+    GtkAccelGroup *accel = gtk_accel_group_new();
+
     window->server_menu = gtk_menu_new();
 
     window->global_entry = entry;
@@ -356,11 +424,29 @@ static void mssh_window_init(MSSHWindow* window)
         mssh_gconf_notify_close_ended, window, NULL, NULL);
     gconf_client_notify_add(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED,
         mssh_gconf_notify_quit_all_ended, window, NULL, NULL);
+    gconf_client_notify_add(client, MSSH_GCONF_KEY_MODIFIER,
+        mssh_gconf_notify_modifier, window, NULL, NULL);
 
     gconf_client_notify(client, MSSH_GCONF_KEY_COLUMNS);
     gconf_client_notify(client, MSSH_GCONF_KEY_TIMEOUT);
     gconf_client_notify(client, MSSH_GCONF_KEY_CLOSE_ENDED);
     gconf_client_notify(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED);
+    gconf_client_notify(client, MSSH_GCONF_KEY_MODIFIER);
+
+    gtk_accel_group_connect(accel, GDK_Up, window->modifier,
+        GTK_ACCEL_VISIBLE, g_cclosure_new(
+        G_CALLBACK(mssh_window_focus), window, NULL));
+    gtk_accel_group_connect(accel, GDK_Down, window->modifier,
+        GTK_ACCEL_VISIBLE, g_cclosure_new(
+        G_CALLBACK(mssh_window_focus), window, NULL));
+    gtk_accel_group_connect(accel, GDK_Left, window->modifier,
+        GTK_ACCEL_VISIBLE, g_cclosure_new(
+        G_CALLBACK(mssh_window_focus), window, NULL));
+    gtk_accel_group_connect(accel, GDK_Right, window->modifier,
+        GTK_ACCEL_VISIBLE, g_cclosure_new(
+        G_CALLBACK(mssh_window_focus), window, NULL));
+
+    gtk_window_add_accel_group(GTK_WINDOW(window), accel);
 }
 
 void mssh_window_start_session(MSSHWindow* window, char **env,

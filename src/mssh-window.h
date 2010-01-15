@@ -31,6 +31,7 @@ typedef struct
     int timeout;
     gboolean close_ended_sessions;
     gboolean exit_on_all_closed;
+    gint modifier;
 } MSSHWindow;
 
 typedef struct

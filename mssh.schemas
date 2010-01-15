@@ -77,6 +77,16 @@
                 <long>Quit MSSH when all ssh sessions have ended</long>
             </locale>
         </schema>
-
+        <schema>
+            <key>/schemas/apps/mssh/modifier</key>
+            <applyto>/apps/mssh/modifier</applyto>
+            <owner>mssh</owner>
+            <type>int</type>
+            <default>8</default>
+            <locale name="C">
+                <short>Shortcut modifier</short>
+                <long>Modifier used in focus shortcuts</long>
+            </locale>
+        </schema>
     </schemalist>
 </gconfschemafile>

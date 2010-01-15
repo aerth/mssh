@@ -18,6 +18,10 @@ G_BEGIN_DECLS
 typedef struct
 {
     GtkWindow widget;
+    GtkWidget *ctrl;
+    GtkWidget *alt;
+    GtkWidget *shift;
+    GtkWidget *super;
 } MSSHPref;
 
 typedef struct

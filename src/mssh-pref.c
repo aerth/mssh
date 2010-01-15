@@ -112,6 +112,26 @@ static void mssh_pref_exit_check(GtkWidget *widget, gpointer data)
         NULL);
 }
 
+static void mssh_pref_modifier_check(GtkWidget *widget, gpointer data)
+{
+    GConfClient *client;
+    gboolean ctrl, alt, shift, super;
+    gint val;
+
+    MSSHPref * pref = MSSH_PREF(data);
+
+    client = gconf_client_get_default();
+
+    ctrl = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pref->ctrl));
+    shift = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pref->shift));
+    alt = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pref->alt));
+    super = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pref->super));
+
+    val = (shift << 0) | (ctrl << 2) | (alt << 3) | (super << 26);
+
+    gconf_client_set_int(client, MSSH_GCONF_KEY_MODIFIER, val, NULL);
+}
+
 static void mssh_pref_init(MSSHPref* pref)
 {
     GConfClient *client;
@@ -155,8 +175,20 @@ static void mssh_pref_init(MSSHPref* pref)
     GtkWidget *columns_select = gtk_spin_button_new(
         GTK_ADJUSTMENT(columns_adj), 1, 0);
 
+    GtkWidget *mod_hbox = gtk_hbox_new(FALSE, 10);
+    GtkWidget *mod_label = gtk_label_new("Modifier:");
+    GtkWidget *mod_ctrl_check = gtk_check_button_new_with_label("Ctrl");
+    GtkWidget *mod_alt_check = gtk_check_button_new_with_label("Alt");
+    GtkWidget *mod_shift_check = gtk_check_button_new_with_label("Shift");
+    GtkWidget *mod_super_check = gtk_check_button_new_with_label("Super");
+
     GtkWidget *close_hbox = gtk_hbox_new(FALSE, 0);
     GtkWidget *close_button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
+
+    pref->ctrl = mod_ctrl_check;
+    pref->shift = mod_shift_check;
+    pref->alt = mod_alt_check;
+    pref->super = mod_super_check;
 
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook), FALSE);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), content, NULL);
@@ -192,6 +224,13 @@ static void mssh_pref_init(MSSHPref* pref)
         TRUE, 0);
     gtk_box_pack_start(GTK_BOX(content), columns_hbox, FALSE, TRUE, 0);
 
+    gtk_box_pack_start(GTK_BOX(mod_hbox), mod_label, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(mod_hbox), mod_ctrl_check, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(mod_hbox), mod_alt_check, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(mod_hbox), mod_shift_check, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(mod_hbox), mod_super_check, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(content), mod_hbox, FALSE, TRUE, 0);
+
     gtk_box_pack_end(GTK_BOX(close_hbox), close_button, FALSE, TRUE, 0);
 
     gtk_box_pack_start(GTK_BOX(frame), notebook, TRUE, TRUE, 0);
@@ -221,6 +260,14 @@ static void mssh_pref_init(MSSHPref* pref)
         G_CALLBACK(mssh_pref_close_check), NULL);
     g_signal_connect(G_OBJECT(exit_check), "toggled",
         G_CALLBACK(mssh_pref_exit_check), NULL);
+    g_signal_connect(G_OBJECT(mod_ctrl_check), "toggled",
+        G_CALLBACK(mssh_pref_modifier_check), pref);
+    g_signal_connect(G_OBJECT(mod_alt_check), "toggled",
+        G_CALLBACK(mssh_pref_modifier_check), pref);
+    g_signal_connect(G_OBJECT(mod_shift_check), "toggled",
+        G_CALLBACK(mssh_pref_modifier_check), pref);
+    g_signal_connect(G_OBJECT(mod_super_check), "toggled",
+        G_CALLBACK(mssh_pref_modifier_check), pref);
 
     client = gconf_client_get_default();
 
@@ -271,6 +318,18 @@ static void mssh_pref_init(MSSHPref* pref)
     value = gconf_entry_get_value(entry);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(exit_check),
         gconf_value_get_bool(value));
+
+    entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_MODIFIER,
+            NULL, TRUE, NULL);
+    value = gconf_entry_get_value(entry);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mod_ctrl_check),
+        (gconf_value_get_int(value) & GDK_CONTROL_MASK) ? 1 : 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mod_shift_check),
+        (gconf_value_get_int(value) & GDK_SHIFT_MASK) ? 1 : 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mod_alt_check),
+        (gconf_value_get_int(value) & GDK_MOD1_MASK) ? 1 : 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mod_super_check),
+        (gconf_value_get_int(value) & GDK_SUPER_MASK) ? 1 : 0);
 }
 
 static void mssh_pref_class_init(MSSHPrefClass *klass)
