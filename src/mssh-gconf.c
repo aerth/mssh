@@ -1,4 +1,5 @@
 #include <vte/vte.h>
+#include <gdk/gdkkeysyms.h>
 
 #include "mssh-gconf.h"
 #include "mssh-window.h"
@@ -169,5 +170,27 @@ void mssh_gconf_notify_modifier(GConfClient *client, guint cnxn_id,
 
     value = gconf_entry_get_value(entry);
 
+    gtk_accel_group_disconnect_key(window->accel, GDK_Up,
+        window->modifier);
+    gtk_accel_group_disconnect_key(window->accel, GDK_Down,
+        window->modifier);
+    gtk_accel_group_disconnect_key(window->accel, GDK_Left,
+        window->modifier);
+    gtk_accel_group_disconnect_key(window->accel, GDK_Right,
+        window->modifier);
+
     window->modifier = gconf_value_get_int(value);
+
+    gtk_accel_group_connect(window->accel, GDK_Up, window->modifier,
+        GTK_ACCEL_VISIBLE, g_cclosure_new(
+        G_CALLBACK(mssh_window_focus), window, NULL));
+    gtk_accel_group_connect(window->accel, GDK_Down, window->modifier,
+        GTK_ACCEL_VISIBLE, g_cclosure_new(
+        G_CALLBACK(mssh_window_focus), window, NULL));
+    gtk_accel_group_connect(window->accel, GDK_Left, window->modifier,
+        GTK_ACCEL_VISIBLE, g_cclosure_new(
+        G_CALLBACK(mssh_window_focus), window, NULL));
+    gtk_accel_group_connect(window->accel, GDK_Right, window->modifier,
+        GTK_ACCEL_VISIBLE, g_cclosure_new(
+        G_CALLBACK(mssh_window_focus), window, NULL));
 }

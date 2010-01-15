@@ -24,6 +24,7 @@ typedef struct
     GtkWidget *table;
     GtkWidget *server_menu;
     GtkWidget *global_entry;
+    GtkAccelGroup *accel;
     GArray *terminals;
     char **env;
     int columns;
@@ -46,6 +47,8 @@ void mssh_window_start_session(MSSHWindow* window, char **env,
     GArray *hosts, long cols);
 void mssh_window_relayout(MSSHWindow *window);
 void mssh_window_session_closed(MSSHTerminal *terminal, gpointer data);
+gboolean mssh_window_focus(GtkWidget *widget, GObject *acceleratable,
+    guint keyval, GdkModifierType modifier, gpointer data);
 
 G_END_DECLS
 

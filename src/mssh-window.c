@@ -113,9 +113,8 @@ static gboolean mssh_window_entry_focused(GtkWidget *widget,
     return FALSE;
 }
 
-static gboolean mssh_window_focus(GtkWidget *widget,
-    GObject *acceleratable, guint keyval, GdkModifierType modifier,
-    gpointer data)
+gboolean mssh_window_focus(GtkWidget *widget, GObject *acceleratable,
+    guint keyval, GdkModifierType modifier, gpointer data)
 {
     MSSHWindow *window = MSSH_WINDOW(data);
     GtkWidget *focus;
@@ -445,6 +444,8 @@ static void mssh_window_init(MSSHWindow* window)
     gtk_accel_group_connect(accel, GDK_Right, window->modifier,
         GTK_ACCEL_VISIBLE, g_cclosure_new(
         G_CALLBACK(mssh_window_focus), window, NULL));
+
+    window->accel = accel;
 
     gtk_window_add_accel_group(GTK_WINDOW(window), accel);
 }
