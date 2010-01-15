@@ -78,6 +78,17 @@
             </locale>
         </schema>
         <schema>
+            <key>/schemas/apps/mssh/dir_focus</key>
+            <applyto>/apps/mssh/dir_focus</applyto>
+            <owner>mssh</owner>
+            <type>bool</type>
+            <default>true</default>
+            <locale name="C">
+                <short>Use directional focus</short>
+                <long>Uses directional focus rather than linear focus</long>
+            </locale>
+        </schema>
+        <schema>
             <key>/schemas/apps/mssh/modifier</key>
             <applyto>/apps/mssh/modifier</applyto>
             <owner>mssh</owner>

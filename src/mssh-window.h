@@ -33,6 +33,8 @@ typedef struct
     gboolean close_ended_sessions;
     gboolean exit_on_all_closed;
     gint modifier;
+    gint dir_focus;
+    gint last_closed;
 } MSSHWindow;
 
 typedef struct

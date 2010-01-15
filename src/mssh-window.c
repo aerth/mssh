@@ -136,34 +136,45 @@ gboolean mssh_window_focus(GtkWidget *widget, GObject *acceleratable,
         }
     }
 
-    if(focus == window->global_entry && keyval == GDK_Down)
+    if(focus == window->global_entry && keyval == GDK_Down &&
+        window->dir_focus)
         idx = 0;
-    else if(idx == -1)
-        return FALSE;
+    else if(idx == -1 && window->dir_focus)
+        return TRUE;
     else
     {
         switch(keyval)
         {
         case GDK_Up:
-            idx = idx - cols;
+            if(window->dir_focus)
+                idx = idx - cols;
             break;
         case GDK_Down:
-            if((idx + cols >= len) && (idx < len -
-                (len % cols) ? (len % cols) : cols))
-                idx = len - 1;
-            else
-                idx = idx + cols;
+            if(window->dir_focus)
+            {
+                if((idx + cols >= len) && (idx < len -
+                    (len % cols) ? (len % cols) : cols))
+                    idx = len - 1;
+                else
+                    idx = idx + cols;
+            }
             break;
         case GDK_Left:
-            if(idx % cols != 0)
+            if(idx % cols != 0 || !window->dir_focus)
                 idx = idx - 1;
             break;
         case GDK_Right:
-            if(idx % cols != cols - 1)
+            if(idx % cols != cols - 1 || !window->dir_focus)
                 idx = idx + 1;
             break;
         }
     }
+
+    if(idx >= len && !window->dir_focus)
+        focus = window->global_entry;
+
+    if(idx < -1 && !window->dir_focus)
+        idx = len - 1;
 
     if(idx < 0)
         focus = window->global_entry;
@@ -193,6 +204,8 @@ static gboolean mssh_window_session_close(gpointer data)
             break;
         }
     }
+
+    data_pair->window->last_closed = idx;
 
     if(idx == -1)
     {
@@ -267,7 +280,23 @@ void mssh_window_relayout(MSSHWindow *window)
     focus = gtk_window_get_focus(GTK_WINDOW(window));
 
     if(!focus)
-        focus = window->global_entry;
+    {
+        if(window->last_closed < 0)
+            window->last_closed = 0;
+
+        if(len == 0)
+            focus = window->global_entry;
+        else if(window->last_closed < len)
+        {
+            focus = GTK_WIDGET(g_array_index(window->terminals,
+                MSSHTerminal*, window->last_closed));
+        }
+        else
+        {
+            focus = GTK_WIDGET(g_array_index(window->terminals,
+                MSSHTerminal*, 0));
+        }
+    }
 
     for(i = 0; i < len; i++)
     {
@@ -360,9 +389,13 @@ static void mssh_window_init(MSSHWindow* window)
 
     GtkAccelGroup *accel = gtk_accel_group_new();
 
+    window->accel = NULL;
+
     window->server_menu = gtk_menu_new();
 
     window->global_entry = entry;
+
+    window->last_closed = -1;
 
     window->terminals = g_array_new(FALSE, TRUE, sizeof(MSSHTerminal*));
 
@@ -423,6 +456,8 @@ static void mssh_window_init(MSSHWindow* window)
         mssh_gconf_notify_close_ended, window, NULL, NULL);
     gconf_client_notify_add(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED,
         mssh_gconf_notify_quit_all_ended, window, NULL, NULL);
+    gconf_client_notify_add(client, MSSH_GCONF_KEY_DIR_FOCUS,
+        mssh_gconf_notify_dir_focus, window, NULL, NULL);
     gconf_client_notify_add(client, MSSH_GCONF_KEY_MODIFIER,
         mssh_gconf_notify_modifier, window, NULL, NULL);
 
@@ -430,6 +465,7 @@ static void mssh_window_init(MSSHWindow* window)
     gconf_client_notify(client, MSSH_GCONF_KEY_TIMEOUT);
     gconf_client_notify(client, MSSH_GCONF_KEY_CLOSE_ENDED);
     gconf_client_notify(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED);
+    gconf_client_notify(client, MSSH_GCONF_KEY_DIR_FOCUS);
     gconf_client_notify(client, MSSH_GCONF_KEY_MODIFIER);
 
     gtk_accel_group_connect(accel, GDK_Up, window->modifier,

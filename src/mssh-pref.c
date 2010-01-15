@@ -112,6 +112,18 @@ static void mssh_pref_exit_check(GtkWidget *widget, gpointer data)
         NULL);
 }
 
+static void mssh_pref_dir_focus_check(GtkWidget *widget, gpointer data)
+{
+    GConfClient *client;
+    gboolean focus;
+
+    client = gconf_client_get_default();
+
+    focus = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+
+    gconf_client_set_bool(client, MSSH_GCONF_KEY_DIR_FOCUS, focus, NULL);
+}
+
 static void mssh_pref_modifier_check(GtkWidget *widget, gpointer data)
 {
     GConfClient *client;
@@ -185,6 +197,9 @@ static void mssh_pref_init(MSSHPref* pref)
     GtkWidget *close_hbox = gtk_hbox_new(FALSE, 0);
     GtkWidget *close_button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
 
+    GtkWidget *dir_focus_check = gtk_check_button_new_with_label(
+        "Use directional focus");
+
     pref->ctrl = mod_ctrl_check;
     pref->shift = mod_shift_check;
     pref->alt = mod_alt_check;
@@ -209,6 +224,7 @@ static void mssh_pref_init(MSSHPref* pref)
 
     gtk_box_pack_start(GTK_BOX(content), exit_check, FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(content), close_check, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(content), dir_focus_check, FALSE, TRUE, 0);
 
     gtk_box_pack_start(GTK_BOX(timeout_hbox), timeout_label1, FALSE,
         TRUE, 0);
@@ -260,6 +276,8 @@ static void mssh_pref_init(MSSHPref* pref)
         G_CALLBACK(mssh_pref_close_check), NULL);
     g_signal_connect(G_OBJECT(exit_check), "toggled",
         G_CALLBACK(mssh_pref_exit_check), NULL);
+     g_signal_connect(G_OBJECT(dir_focus_check), "toggled",
+        G_CALLBACK(mssh_pref_dir_focus_check), NULL);
     g_signal_connect(G_OBJECT(mod_ctrl_check), "toggled",
         G_CALLBACK(mssh_pref_modifier_check), pref);
     g_signal_connect(G_OBJECT(mod_alt_check), "toggled",
@@ -317,6 +335,12 @@ static void mssh_pref_init(MSSHPref* pref)
             NULL, TRUE, NULL);
     value = gconf_entry_get_value(entry);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(exit_check),
+        gconf_value_get_bool(value));
+
+    entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_DIR_FOCUS,
+            NULL, TRUE, NULL);
+    value = gconf_entry_get_value(entry);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dir_focus_check),
         gconf_value_get_bool(value));
 
     entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_MODIFIER,

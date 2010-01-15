@@ -161,6 +161,18 @@ void mssh_gconf_notify_quit_all_ended(GConfClient *client, guint cnxn_id,
     window->exit_on_all_closed = gconf_value_get_bool(value);
 }
 
+void mssh_gconf_notify_dir_focus(GConfClient *client, guint cnxn_id,
+    GConfEntry *entry, gpointer data)
+{
+    GConfValue *value;
+
+    MSSHWindow *window = MSSH_WINDOW(data);
+
+    value = gconf_entry_get_value(entry);
+
+    window->dir_focus = gconf_value_get_bool(value);
+}
+
 void mssh_gconf_notify_modifier(GConfClient *client, guint cnxn_id,
     GConfEntry *entry, gpointer data)
 {
@@ -170,27 +182,33 @@ void mssh_gconf_notify_modifier(GConfClient *client, guint cnxn_id,
 
     value = gconf_entry_get_value(entry);
 
-    gtk_accel_group_disconnect_key(window->accel, GDK_Up,
-        window->modifier);
-    gtk_accel_group_disconnect_key(window->accel, GDK_Down,
-        window->modifier);
-    gtk_accel_group_disconnect_key(window->accel, GDK_Left,
-        window->modifier);
-    gtk_accel_group_disconnect_key(window->accel, GDK_Right,
-        window->modifier);
+    if(window->accel)
+    {
+        gtk_accel_group_disconnect_key(window->accel, GDK_Up,
+            window->modifier);
+        gtk_accel_group_disconnect_key(window->accel, GDK_Down,
+            window->modifier);
+        gtk_accel_group_disconnect_key(window->accel, GDK_Left,
+            window->modifier);
+        gtk_accel_group_disconnect_key(window->accel, GDK_Right,
+            window->modifier);
+    }
 
     window->modifier = gconf_value_get_int(value);
 
-    gtk_accel_group_connect(window->accel, GDK_Up, window->modifier,
-        GTK_ACCEL_VISIBLE, g_cclosure_new(
-        G_CALLBACK(mssh_window_focus), window, NULL));
-    gtk_accel_group_connect(window->accel, GDK_Down, window->modifier,
-        GTK_ACCEL_VISIBLE, g_cclosure_new(
-        G_CALLBACK(mssh_window_focus), window, NULL));
-    gtk_accel_group_connect(window->accel, GDK_Left, window->modifier,
-        GTK_ACCEL_VISIBLE, g_cclosure_new(
-        G_CALLBACK(mssh_window_focus), window, NULL));
-    gtk_accel_group_connect(window->accel, GDK_Right, window->modifier,
-        GTK_ACCEL_VISIBLE, g_cclosure_new(
-        G_CALLBACK(mssh_window_focus), window, NULL));
+    if(window->accel)
+    {
+        gtk_accel_group_connect(window->accel, GDK_Up, window->modifier,
+            GTK_ACCEL_VISIBLE, g_cclosure_new(
+            G_CALLBACK(mssh_window_focus), window, NULL));
+        gtk_accel_group_connect(window->accel, GDK_Down, window->modifier,
+            GTK_ACCEL_VISIBLE, g_cclosure_new(
+            G_CALLBACK(mssh_window_focus), window, NULL));
+        gtk_accel_group_connect(window->accel, GDK_Left, window->modifier,
+            GTK_ACCEL_VISIBLE, g_cclosure_new(
+            G_CALLBACK(mssh_window_focus), window, NULL));
+        gtk_accel_group_connect(window->accel, GDK_Right, window->modifier,
+            GTK_ACCEL_VISIBLE, g_cclosure_new(
+            G_CALLBACK(mssh_window_focus), window, NULL));
+    }
 }
