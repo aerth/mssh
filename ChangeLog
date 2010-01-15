@@ -1,3 +1,23 @@
+2010-01-15  Bradley Smith  <brad@brad-smith.co.uk>
+
+	Bump to version 1.2
+
+	Add directional focus option, and focus next window on session close.
+
+	Redo accel group when modifier changes.
+
+	Add directional focus.
+
+2010-01-14  Bradley Smith  <brad@brad-smith.co.uk>
+
+	Make sure focus is preserved when a session closes, restore back to global entry if focused window closed.
+
+	Add call to vte_terminal_set_word_chars.
+
+	Get rid of horrible tabs in files.
+
+	Add columns override option.
+
 2009-09-05  Bradley Smith  <brad@brad-smith.co.uk>
 
 	Bump version to 1.1.

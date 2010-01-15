@@ -1,4 +1,4 @@
-AC_INIT([MultiSSH], [1.1], [brad@brad-smith.co.uk], [mssh])
+AC_INIT([MultiSSH], [1.2], [brad@brad-smith.co.uk], [mssh])
 AM_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE
 
