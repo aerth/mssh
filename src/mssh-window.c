@@ -366,7 +366,7 @@ static void mssh_window_init(MSSHWindow* window)
 {
     GConfClient *client;
 
-    GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
+    GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     GtkWidget *entry = gtk_entry_new();
 
     GtkWidget *menu_bar = gtk_menu_bar_new();

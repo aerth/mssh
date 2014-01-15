@@ -152,15 +152,15 @@ static void mssh_pref_init(MSSHPref* pref)
     GdkRGBA colour;
     const gchar *colour_s;
 
-    GtkWidget *frame = gtk_vbox_new(FALSE, 5);
+    GtkWidget *frame = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     GtkWidget *notebook = gtk_notebook_new();
-    GtkWidget *content = gtk_vbox_new(FALSE, 4);
+    GtkWidget *content = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
 
-    GtkWidget *font_hbox = gtk_hbox_new(FALSE, 10);
+    GtkWidget *font_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *font_label = gtk_label_new("Font:");
     GtkWidget *font_select = gtk_font_button_new();
 
-    GtkWidget *colour_table = gtk_table_new(2, 2, FALSE);
+    GtkWidget *colour_table = gtk_grid_new();
     GtkWidget *bg_colour_label = gtk_label_new("Background:");
     GtkWidget *bg_colour_select = gtk_color_button_new();
     GtkWidget *fg_colour_label = gtk_label_new("Foreground:");
@@ -171,28 +171,28 @@ static void mssh_pref_init(MSSHPref* pref)
     GtkWidget *close_check = gtk_check_button_new_with_label(
         "Close ended sessions");
 
-    GtkWidget *timeout_hbox = gtk_hbox_new(FALSE, 10);
+    GtkWidget *timeout_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *timeout_label1 = gtk_label_new(
         "Closed ended sessions after");
-    GtkObject *timeout_adj = gtk_adjustment_new(3, 0, 100, 1, 10, 0);
+    GtkAdjustment *timeout_adj = gtk_adjustment_new(3, 0, 100, 1, 10, 0);
     GtkWidget *timeout_select = gtk_spin_button_new(
         GTK_ADJUSTMENT(timeout_adj), 1, 0);
     GtkWidget *timeout_label2 = gtk_label_new("seconds");
 
-    GtkWidget *columns_hbox = gtk_hbox_new(FALSE, 10);
+    GtkWidget *columns_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *columns_label = gtk_label_new("Columns:");
-    GtkObject *columns_adj = gtk_adjustment_new(2, 1, 10, 1, 10, 0);
+    GtkAdjustment *columns_adj = gtk_adjustment_new(2, 1, 10, 1, 10, 0);
     GtkWidget *columns_select = gtk_spin_button_new(
         GTK_ADJUSTMENT(columns_adj), 1, 0);
 
-    GtkWidget *mod_hbox = gtk_hbox_new(FALSE, 10);
+    GtkWidget *mod_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *mod_label = gtk_label_new("Modifier:");
     GtkWidget *mod_ctrl_check = gtk_check_button_new_with_label("Ctrl");
     GtkWidget *mod_alt_check = gtk_check_button_new_with_label("Alt");
     GtkWidget *mod_shift_check = gtk_check_button_new_with_label("Shift");
     GtkWidget *mod_super_check = gtk_check_button_new_with_label("Super");
 
-    GtkWidget *close_hbox = gtk_hbox_new(FALSE, 0);
+    GtkWidget *close_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     GtkWidget *close_button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
 
     GtkWidget *dir_focus_check = gtk_check_button_new_with_label(
