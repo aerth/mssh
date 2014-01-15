@@ -434,7 +434,8 @@ static void mssh_window_init(MSSHWindow* window)
 
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
-    gtk_widget_set_size_request(GTK_WIDGET(window), 1024, 768);
+    gtk_widget_set_size_request(GTK_WIDGET(window), 0, 0);
+    gtk_window_set_default_size(GTK_WINDOW(window), 1024, 768);
     gtk_window_set_title(GTK_WINDOW(window), PACKAGE_NAME);
 
     client = gconf_client_get_default();
