@@ -61,7 +61,7 @@ void mssh_gconf_notify_bg_colour(GConfClient *client, guint cnxn_id,
 
     for(i = 0; i < window->terminals->len; i++)
     {
-        vte_terminal_set_color_background(VTE_TERMINAL(g_array_index(
+        vte_terminal_set_color_background_rgba(VTE_TERMINAL(g_array_index(
             window->terminals, MSSHTerminal*, i)), &colour);
     }
 }
