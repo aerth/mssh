@@ -216,7 +216,7 @@ static gboolean mssh_window_session_close(gpointer data)
     {
         gtk_widget_destroy(data_pair->terminal->menu_item);
 
-        gtk_container_remove(GTK_CONTAINER(data_pair->window->table),
+        gtk_container_remove(GTK_CONTAINER(data_pair->window->grid),
             GTK_WIDGET(data_pair->terminal));
 
         g_array_remove_index(data_pair->window->terminals, idx);
@@ -275,7 +275,7 @@ void mssh_window_relayout(MSSHWindow *window)
     int wcols = window->columns_override ? window->columns_override :
         window->columns;
     int cols = (len < wcols) ? len : wcols;
-    int rows = (len + 0.5) / cols;
+    int width = 1;
 
     focus = gtk_window_get_focus(GTK_WINDOW(window));
 
@@ -304,16 +304,28 @@ void mssh_window_relayout(MSSHWindow *window)
             MSSHTerminal*, i);
 
         g_object_ref(terminal);
-        if(gtk_widget_get_parent(GTK_WIDGET(terminal)) == GTK_WIDGET(window->table))
+        if(gtk_widget_get_parent(GTK_WIDGET(terminal)) == GTK_WIDGET(window->grid))
         {
-            gtk_container_remove(GTK_CONTAINER(window->table),
+            gtk_container_remove(GTK_CONTAINER(window->grid),
                 GTK_WIDGET(terminal));
         }
 
-        gtk_table_attach(GTK_TABLE(window->table), GTK_WIDGET(terminal),
-            (i % cols), (i == len - 1) ? cols : (i % cols) + 1, i / cols,
-            (i / cols) + 1,
-            GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 1, 1);
+        /* Set margins to terminal widget */
+        gtk_widget_set_margin_left(GTK_WIDGET(terminal), 1);
+        gtk_widget_set_margin_right(GTK_WIDGET(terminal), 1);
+        gtk_widget_set_margin_top(GTK_WIDGET(terminal), 1);
+        gtk_widget_set_margin_bottom(GTK_WIDGET(terminal), 1);
+
+        if (i == len - 1) {
+            width = cols - (i % cols);
+        }
+        gtk_grid_attach(GTK_GRID(window->grid), /* grid */
+                        GTK_WIDGET(terminal),   /* child */
+                        (i % cols),             /* left */
+                        i / cols,               /* top */
+                        width,                  /* width */
+                        1);                     /* height */
+
         g_object_unref(terminal);
 
         if(!terminal->started)
@@ -321,11 +333,6 @@ void mssh_window_relayout(MSSHWindow *window)
             mssh_terminal_start_session(terminal, window->env);
             terminal->started = 1;
         }
-    }
-
-    if(len > 0)
-    {
-        gtk_table_resize(GTK_TABLE(window->table), rows, cols);
     }
 
     client = gconf_client_get_default();
@@ -429,8 +436,10 @@ static void mssh_window_init(MSSHWindow* window)
     gtk_box_pack_start(GTK_BOX(vbox), menu_bar, FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), entry, FALSE, TRUE, 2);
 
-    window->table = gtk_table_new(1, 1, TRUE);
-    gtk_box_pack_start(GTK_BOX(vbox), window->table, TRUE, TRUE, 0);
+    window->grid = gtk_grid_new();
+    gtk_grid_set_row_homogeneous(GTK_GRID(window->grid), TRUE);
+    gtk_grid_set_column_homogeneous(GTK_GRID(window->grid), TRUE);
+    gtk_box_pack_start(GTK_BOX(vbox), window->grid, TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(window), vbox);
 

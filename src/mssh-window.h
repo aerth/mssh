@@ -21,7 +21,7 @@ G_BEGIN_DECLS
 typedef struct
 {
     GtkWindow widget;
-    GtkWidget *table;
+    GtkWidget *grid;
     GtkWidget *server_menu;
     GtkWidget *global_entry;
     GtkAccelGroup *accel;
