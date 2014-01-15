@@ -1,0 +1,38 @@
+.TH MSSH 1
+.SH NAME
+mssh \- tool to administrate multiple servers at once
+.SH SYNOPSIS
+.B mssh
+[\fIOPTION\fR]... (-a \fIALIAS\fR | \fIHOSTS\fR[\fI:PORT\fR])
+.SH DESCRIPTION
+.B MultiSSH
+is a GTK+ based ssh client to issue the same commands to multiple servers.
+
+.B MultiSSH
+will connect to the servers specified in \fIHOSTS\fR into optional \fIPORT\fR.
+.SH OPTIONS
+.TP
+\fB-a\fR, \fB\-\-alias\fR=\fIALIAS\fR
+Open hosts associated with named alias
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Display this help and exit
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Output version information and exit
+.SH CONFIGURATION
+The configuration file for
+.B MultiSSH
+should be located in
+.B $HOME/.mssh_clusters
+
+It uses a simple key: pair system with an alias on the left of the
+colon and a space separated list of hosts on the right.
+
+.SH AUTHOR
+.B MultiSSH
+was written by Bradley Smith <brad@brad\-smith.co.uk>
+.SH COPYRIGHT
+Copyright (C) 2009 Bradley Smith <brad@brad\-smith.co.uk>
+.SH REPORTING BUGS
+Report bugs to <brad@brad\-smith.co.uk>.

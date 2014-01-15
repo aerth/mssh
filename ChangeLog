@@ -4,6 +4,8 @@
 
     Added patch from Mario J. Barchéin and Francisco Licerán to support port numbers on host
 
+    Copy Debian's mssh man page to upstream and added Karl Goetz <karl@kgoetz.id.au> patch
+
 2014-01-15  Héctor García  <hector@debian.org>
 
     Bumped version to 1.3 gtk2 deprecated symbols free
