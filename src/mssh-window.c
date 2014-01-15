@@ -136,7 +136,7 @@ gboolean mssh_window_focus(GtkWidget *widget, GObject *acceleratable,
         }
     }
 
-    if(focus == window->global_entry && keyval == GDK_Down &&
+    if(focus == window->global_entry && keyval == GDK_KEY_Down &&
         window->dir_focus)
         idx = 0;
     else if(idx == -1 && window->dir_focus)
@@ -145,11 +145,11 @@ gboolean mssh_window_focus(GtkWidget *widget, GObject *acceleratable,
     {
         switch(keyval)
         {
-        case GDK_Up:
+        case GDK_KEY_Up:
             if(window->dir_focus)
                 idx = idx - cols;
             break;
-        case GDK_Down:
+        case GDK_KEY_Down:
             if(window->dir_focus)
             {
                 if((idx + cols >= len) && (idx < len -
@@ -159,11 +159,11 @@ gboolean mssh_window_focus(GtkWidget *widget, GObject *acceleratable,
                     idx = idx + cols;
             }
             break;
-        case GDK_Left:
+        case GDK_KEY_Left:
             if(idx % cols != 0 || !window->dir_focus)
                 idx = idx - 1;
             break;
-        case GDK_Right:
+        case GDK_KEY_Right:
             if(idx % cols != cols - 1 || !window->dir_focus)
                 idx = idx + 1;
             break;
@@ -468,16 +468,16 @@ static void mssh_window_init(MSSHWindow* window)
     gconf_client_notify(client, MSSH_GCONF_KEY_DIR_FOCUS);
     gconf_client_notify(client, MSSH_GCONF_KEY_MODIFIER);
 
-    gtk_accel_group_connect(accel, GDK_Up, window->modifier,
+    gtk_accel_group_connect(accel, GDK_KEY_Up, window->modifier,
         GTK_ACCEL_VISIBLE, g_cclosure_new(
         G_CALLBACK(mssh_window_focus), window, NULL));
-    gtk_accel_group_connect(accel, GDK_Down, window->modifier,
+    gtk_accel_group_connect(accel, GDK_KEY_Down, window->modifier,
         GTK_ACCEL_VISIBLE, g_cclosure_new(
         G_CALLBACK(mssh_window_focus), window, NULL));
-    gtk_accel_group_connect(accel, GDK_Left, window->modifier,
+    gtk_accel_group_connect(accel, GDK_KEY_Left, window->modifier,
         GTK_ACCEL_VISIBLE, g_cclosure_new(
         G_CALLBACK(mssh_window_focus), window, NULL));
-    gtk_accel_group_connect(accel, GDK_Right, window->modifier,
+    gtk_accel_group_connect(accel, GDK_KEY_Right, window->modifier,
         GTK_ACCEL_VISIBLE, g_cclosure_new(
         G_CALLBACK(mssh_window_focus), window, NULL));
 
