@@ -304,7 +304,7 @@ void mssh_window_relayout(MSSHWindow *window)
             MSSHTerminal*, i);
 
         g_object_ref(terminal);
-        if(GTK_WIDGET(terminal)->parent == GTK_WIDGET(window->table))
+        if(gtk_widget_get_parent(GTK_WIDGET(terminal)) == GTK_WIDGET(window->table))
         {
             gtk_container_remove(GTK_CONTAINER(window->table),
                 GTK_WIDGET(terminal));
