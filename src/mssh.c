@@ -121,6 +121,9 @@ GData **parse_aliases(char *conffile)
         if(strcmp(line, "") == 0)
             continue;
 
+        if( *line == '#')
+            continue;
+
         if((sep = strchr(line, ':')) == NULL)
         {
             printf("Line %d: Failed to parse line '%s'\n", lineno, line);

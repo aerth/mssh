@@ -1,5 +1,9 @@
 2014-01-15  Héctor García  <hector@debian.org>
 
+    Added patch from Oscar Fernandez to support comments on configuration archive
+
+2014-01-15  Héctor García  <hector@debian.org>
+
     Bumped version to 1.3 gtk2 deprecated symbols free
 
     Replaced GDK_<keyname> with GDK_KEY_<keyname>
