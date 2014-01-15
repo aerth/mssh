@@ -36,13 +36,13 @@ static void mssh_pref_font_select(GtkWidget *widget, gpointer data)
 static void mssh_pref_fg_colour_select(GtkWidget *widget, gpointer data)
 {
     GConfClient *client;
-    GdkColor colour;
+    GdkRGBA colour;
     const gchar *colour_s;
 
     client = gconf_client_get_default();
 
-    gtk_color_button_get_color(GTK_COLOR_BUTTON(widget), &colour);
-    colour_s = gdk_color_to_string(&colour);
+    gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &colour);
+    colour_s = gdk_rgba_to_string(&colour);
 
     gconf_client_set_string(client, MSSH_GCONF_KEY_FG_COLOUR, colour_s,
         NULL);
@@ -51,13 +51,13 @@ static void mssh_pref_fg_colour_select(GtkWidget *widget, gpointer data)
 static void mssh_pref_bg_colour_select(GtkWidget *widget, gpointer data)
 {
     GConfClient *client;
-    GdkColor colour;
+    GdkRGBA colour;
     const gchar *colour_s;
 
     client = gconf_client_get_default();
 
-    gtk_color_button_get_color(GTK_COLOR_BUTTON(widget), &colour);
-    colour_s = gdk_color_to_string(&colour);
+    gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &colour);
+    colour_s = gdk_rgba_to_string(&colour);
 
     gconf_client_set_string(client, MSSH_GCONF_KEY_BG_COLOUR, colour_s,
         NULL);
@@ -149,9 +149,7 @@ static void mssh_pref_init(MSSHPref* pref)
     GConfClient *client;
     GConfEntry *entry;
     GConfValue *value;
-    GdkVisual *visual = gdk_visual_get_system();
-    GdkColormap *colour_map = gdk_colormap_new(visual, TRUE);
-    GdkColor colour;
+    GdkRGBA colour;
     const gchar *colour_s;
 
     GtkWidget *frame = gtk_vbox_new(FALSE, 5);
@@ -299,18 +297,16 @@ static void mssh_pref_init(MSSHPref* pref)
         TRUE, NULL);
     value = gconf_entry_get_value(entry);
     colour_s = gconf_value_get_string(value);
-    gdk_colormap_alloc_color(colour_map, &colour, TRUE, TRUE);
-    gdk_color_parse(colour_s, &colour);
-    gtk_color_button_set_color(GTK_COLOR_BUTTON(fg_colour_select),
+    gdk_rgba_parse(&colour, colour_s);
+    gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(fg_colour_select), 
         &colour);
 
     entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BG_COLOUR, NULL,
         TRUE, NULL);
     value = gconf_entry_get_value(entry);
     colour_s = gconf_value_get_string(value);
-    gdk_colormap_alloc_color(colour_map, &colour, TRUE, TRUE);
-    gdk_color_parse(colour_s, &colour);
-    gtk_color_button_set_color(GTK_COLOR_BUTTON(bg_colour_select),
+    gdk_rgba_parse(&colour, colour_s);
+    gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(bg_colour_select),
         &colour);
 
     entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_COLUMNS, NULL,
