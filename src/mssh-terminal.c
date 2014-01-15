@@ -46,8 +46,17 @@ void mssh_terminal_start_session(MSSHTerminal *terminal, char **env)
     args[1] = terminal->hostname;
     args[2] = NULL;
 
-    vte_terminal_fork_command(VTE_TERMINAL(terminal), "ssh", args,
-        env, NULL, FALSE, FALSE, FALSE);
+    vte_terminal_fork_command_full(  VTE_TERMINAL(terminal), 
+                                     VTE_PTY_DEFAULT,
+                                     NULL,  /* working dir */
+                                     args,
+                                     env, 
+                                     G_SPAWN_SEARCH_PATH,
+                                     NULL,  /* child_setup */
+                                     NULL,  /* child_setup_data */
+                                     NULL,  /* *child_pid */
+                                     NULL); /* Error handling */
+
 
     free(args[0]);
 }
