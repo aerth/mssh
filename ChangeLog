@@ -5,6 +5,12 @@
     Changed from gdk_color_ to gdk_rgba_ functions
     Changed from gtk_color_button to gtk_color_chooser
 
+    Change from gtk_vbox and gtk_hbox to gtk_box
+
+    Change colour_table from GTK_TABLE to GTK_GRID
+
+    Change table where to place terminals to grid
+
 2014-01-15  Héctor García  <hector@debian.org>
 
     Bumped version to 1.3 gtk2 deprecated symbols free
