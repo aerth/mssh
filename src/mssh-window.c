@@ -415,9 +415,9 @@ static void mssh_window_init(MSSHWindow* window)
     g_signal_connect(G_OBJECT(edit_pref), "activate",
         G_CALLBACK(mssh_window_pref), window);
 
-    gtk_menu_bar_append(GTK_MENU_BAR(menu_bar), file_item);
-    gtk_menu_bar_append(GTK_MENU_BAR(menu_bar), edit_item);
-    gtk_menu_bar_append(GTK_MENU_BAR(menu_bar), server_item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file_item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), edit_item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), server_item);
 
     g_signal_connect(G_OBJECT(entry), "key-press-event",
         G_CALLBACK(mssh_window_key_press), window);
