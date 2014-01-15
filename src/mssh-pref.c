@@ -210,14 +210,14 @@ static void mssh_pref_init(MSSHPref* pref)
     gtk_box_pack_start(GTK_BOX(font_hbox), font_select, FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(content), font_hbox, FALSE, TRUE, 0);
 
-    gtk_table_attach(GTK_TABLE(colour_table), bg_colour_label,
-        0, 1, 0, 1, GTK_FILL, GTK_FILL, 0, 0);
-    gtk_table_attach(GTK_TABLE(colour_table), bg_colour_select,
-        1, 2, 0, 1, GTK_FILL, GTK_FILL, 0, 0);
-    gtk_table_attach(GTK_TABLE(colour_table), fg_colour_label,
-        0, 1, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
-    gtk_table_attach(GTK_TABLE(colour_table), fg_colour_select,
-        1, 2, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
+    gtk_grid_attach(GTK_GRID(colour_table), bg_colour_label,
+        0, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(colour_table), bg_colour_select,
+        1, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(colour_table), fg_colour_label,
+        0, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(colour_table), fg_colour_select,
+        1, 1, 1, 1);
     gtk_box_pack_start(GTK_BOX(content), colour_table, FALSE, TRUE, 0);
 
     gtk_box_pack_start(GTK_BOX(content), exit_check, FALSE, TRUE, 0);
