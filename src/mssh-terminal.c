@@ -50,12 +50,12 @@ void mssh_terminal_start_session(MSSHTerminal *terminal, char **env)
     port = strtok(NULL, "");
 
     args[0] = strdup("ssh");
-    args[1] = terminal->hostname;
+    args[1] = host;
 
     if (!port)
         args[2] = NULL;
     else {
-         args[2] = "-p";
+         args[2] = strdup("-p");
          args[3] = port;
          args[4] = NULL;
     }
