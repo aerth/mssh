@@ -1,3 +1,7 @@
+2014-01-20  Héctor García  <hector@debian.org>
+
+    Make paste with mouse middle button focus on terminal
+
 2014-01-15  Héctor García  <hector@debian.org>
 
     Added patch from Oscar Fernandez to support comments on configuration archive
