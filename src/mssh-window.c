@@ -21,6 +21,8 @@ static gboolean mssh_window_entry_focused(GtkWidget *widget,
 static gboolean mssh_window_session_close(gpointer data);
 static void mssh_window_session_focused(MSSHTerminal *terminal,
     gpointer data);
+static gboolean mssh_window_mouse_paste_cb(MSSHTerminal *terminal,
+    gpointer data);
 static void mssh_window_insert(GtkWidget *widget, gchar *new_text,
     gint new_text_length, gint *position, gpointer data);
 static void mssh_window_add_session(MSSHWindow *window, char *hostname);
@@ -248,6 +250,14 @@ void mssh_window_session_closed(MSSHTerminal *terminal, gpointer data)
     }
 }
 
+static gboolean mssh_window_mouse_paste_cb(MSSHTerminal *terminal,
+    gpointer data)
+{
+    gtk_widget_grab_focus(GTK_WIDGET(terminal));
+
+    return FALSE;
+}
+
 static void mssh_window_session_focused(MSSHTerminal *terminal,
     gpointer data)
 {
@@ -355,6 +365,8 @@ static void mssh_window_add_session(MSSHWindow *window, char *hostname)
         G_CALLBACK(mssh_window_session_closed), window);
     g_signal_connect(G_OBJECT(terminal), "session-focused",
         G_CALLBACK(mssh_window_session_focused), window);
+    g_signal_connect(GTK_WIDGET(terminal), "button-release-event",
+        G_CALLBACK(mssh_window_mouse_paste_cb), window);
 
     mssh_terminal_init_session(terminal, hostname);
 
