@@ -1,28 +1,32 @@
+2014-03-13  Héctor García  <hector@debian.org>
+
+	Added a new feature to the aliases file. Now you can define aliases for command line text to send using {}
+
 2014-01-20  Héctor García  <hector@debian.org>
 
-    Make paste with mouse middle button focus on terminal
+	Make paste with mouse middle button focus on terminal
 
 2014-01-15  Héctor García  <hector@debian.org>
 
-    Added patch from Oscar Fernandez to support comments on configuration archive
+	Added patch from Oscar Fernandez to support comments on configuration archive
 
-    Added patch from Mario J. Barchéin and Francisco Licerán to support port numbers on host
+	Added patch from Mario J. Barchéin and Francisco Licerán to support port numbers on host
 
-    Copy Debian's mssh man page to upstream and added Karl Goetz <karl@kgoetz.id.au> patch
+	Copy Debian's mssh man page to upstream and added Karl Goetz <karl@kgoetz.id.au> patch
 
-    Allow window to be smaller than 1024x768. Patch from Lorenzo Masini <rugginoso@develer.com>
+	Allow window to be smaller than 1024x768. Patch from Lorenzo Masini <rugginoso@develer.com>
 
 2014-01-15  Héctor García  <hector@debian.org>
 
-    Bumped version to 1.3 gtk2 deprecated symbols free
+	Bumped version to 1.3 gtk2 deprecated symbols free
 
-    Replaced GDK_<keyname> with GDK_KEY_<keyname>
+	Replaced GDK_<keyname> with GDK_KEY_<keyname>
 
-    Changed direct access to use accessor for terminal->parent
+	Changed direct access to use accessor for terminal->parent
 
-    Changed deprecated gtk_menu_bar_append with gtk_menu_shell_append
+	Changed deprecated gtk_menu_bar_append with gtk_menu_shell_append
 
-    Migrate from vte_terminal_fork_command to vte_terminal_fork_command_full to make compile against GTK 2.24
+	Migrate from vte_terminal_fork_command to vte_terminal_fork_command_full to make compile against GTK 2.24
 
 2010-01-15  Bradley Smith  <brad@brad-smith.co.uk>
 

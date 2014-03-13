@@ -55,6 +55,24 @@ static void mssh_window_sendhost(GtkWidget *widget, gpointer data)
     }
 }
 
+static void mssh_window_sendcommand(GtkWidget *widget, gpointer data)
+{
+    int i;
+    char *command;
+
+    MSSHWindow *window = MSSH_WINDOW(data);
+    GtkMenuItem *item = (GtkMenuItem *)widget;
+
+    command = g_datalist_get_data(MSSH_WINDOW(data)->commands, gtk_menu_item_get_label (item));
+
+    for(i = 0; i < window->terminals->len; i++)
+    {
+        mssh_terminal_send_string(g_array_index(window->terminals,
+            MSSHTerminal*, i), command);
+    }
+
+}
+
 static void mssh_window_destroy(GtkWidget *widget, gpointer data)
 {
     gtk_main_quit();
@@ -388,6 +406,7 @@ static void mssh_window_init(MSSHWindow* window)
     GtkWidget *file_item = gtk_menu_item_new_with_label("File");
     GtkWidget *edit_item = gtk_menu_item_new_with_label("Edit");
     GtkWidget *server_item = gtk_menu_item_new_with_label("Servers");
+    GtkWidget *command_item = gtk_menu_item_new_with_label("Commands");
 
     GtkWidget *file_quit = gtk_image_menu_item_new_from_stock(
         GTK_STOCK_QUIT, NULL);
@@ -405,6 +424,8 @@ static void mssh_window_init(MSSHWindow* window)
 
     window->server_menu = gtk_menu_new();
 
+    window->command_menu = gtk_menu_new();
+
     window->global_entry = entry;
 
     window->last_closed = -1;
@@ -415,6 +436,8 @@ static void mssh_window_init(MSSHWindow* window)
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(server_item),
         window->server_menu);
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(command_item),
+        window->command_menu);
 
 /*  gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_add);*/
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_sendhost);
@@ -430,6 +453,7 @@ static void mssh_window_init(MSSHWindow* window)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file_item);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), edit_item);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), server_item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), command_item);
 
     g_signal_connect(G_OBJECT(entry), "key-press-event",
         G_CALLBACK(mssh_window_key_press), window);
@@ -523,6 +547,18 @@ void mssh_window_start_session(MSSHWindow* window, char **env,
     }
 
     mssh_window_relayout(window);
+}
+
+void mssh_window_add_command(GQuark key_id, gpointer data, gpointer user_data)
+{
+    GtkWidget *menu_item;
+    GtkWidget* window = (GtkWidget *)user_data;
+
+    menu_item = gtk_menu_item_new_with_label(g_quark_to_string (key_id));
+
+    gtk_menu_shell_append(GTK_MENU_SHELL(MSSH_WINDOW(window)->command_menu), menu_item);
+    g_signal_connect(G_OBJECT(menu_item), "activate",
+        G_CALLBACK(mssh_window_sendcommand), window);
 }
 
 static void mssh_window_class_init(MSSHWindowClass *klass)
