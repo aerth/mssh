@@ -36,6 +36,8 @@ typedef struct
     gint dir_focus;
     gint last_closed;
     gint backscroll_buffer_size;
+    GtkWidget *last_focus;
+    int is_maximized;
 } MSSHWindow;
 
 typedef struct
@@ -51,6 +53,8 @@ void mssh_window_start_session(MSSHWindow* window, char **env,
 void mssh_window_relayout(MSSHWindow *window);
 void mssh_window_session_closed(MSSHTerminal *terminal, gpointer data);
 gboolean mssh_window_focus(GtkWidget *widget, GObject *acceleratable,
+    guint keyval, GdkModifierType modifier, gpointer data);
+gboolean mssh_window_toggle_maximize(GtkWidget *widget, GObject *acceleratable,
     guint keyval, GdkModifierType modifier, gpointer data);
 
 G_END_DECLS

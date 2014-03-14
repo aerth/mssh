@@ -26,6 +26,9 @@ static void mssh_window_insert(GtkWidget *widget, gchar *new_text,
 static void mssh_window_add_session(MSSHWindow *window, char *hostname);
 static void mssh_window_init(MSSHWindow* window);
 static void mssh_window_class_init(MSSHWindowClass *klass);
+static void mssh_window_maximize(GtkWidget *widget, gpointer data);
+static void mssh_window_restore_layout(GtkWidget *widget, gpointer data);
+void mssh_window_relayout_for_one(MSSHWindow *window, GtkWidget *t);
 
 G_DEFINE_TYPE(MSSHWindow, mssh_window, GTK_TYPE_WINDOW)
 
@@ -109,6 +112,7 @@ static gboolean mssh_window_entry_focused(GtkWidget *widget,
     MSSHWindow *window = MSSH_WINDOW(data);
 
     gtk_window_set_title(GTK_WINDOW(window), PACKAGE_NAME" - All");
+    window->last_focus = NULL;
 
     return FALSE;
 }
@@ -222,6 +226,9 @@ static gboolean mssh_window_session_close(gpointer data)
         g_array_remove_index(data_pair->window->terminals, idx);
 
         mssh_window_relayout(data_pair->window);
+
+        /* set the focus on the entry */
+        gtk_window_set_focus(GTK_WINDOW(data_pair->window), GTK_WIDGET(data_pair->window->global_entry));
     }
 
     if(data_pair->window->terminals->len == 0 &&
@@ -409,6 +416,8 @@ static void mssh_window_init(MSSHWindow* window)
 
     window->backscroll_buffer_size = 5000;
 
+    window->is_maximized = 0;
+
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_item), file_menu);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(server_item),
@@ -496,6 +505,11 @@ static void mssh_window_init(MSSHWindow* window)
         GTK_ACCEL_VISIBLE, g_cclosure_new(
         G_CALLBACK(mssh_window_focus), window, NULL));
 
+    /* bind Ctrl + Shift + x to toggling maximize terminal */
+    gtk_accel_group_connect(accel, GDK_KEY_x, GDK_CONTROL_MASK | GDK_SHIFT_MASK,
+        GTK_ACCEL_VISIBLE, g_cclosure_new(
+        G_CALLBACK(mssh_window_toggle_maximize), window, NULL));
+
     window->accel = accel;
 
     gtk_window_add_accel_group(GTK_WINDOW(window), accel);
@@ -529,4 +543,100 @@ void mssh_window_start_session(MSSHWindow* window, char **env,
 
 static void mssh_window_class_init(MSSHWindowClass *klass)
 {
+}
+
+void mssh_window_relayout_for_one(MSSHWindow *window, GtkWidget *t)
+{
+
+    int len = window->terminals->len;
+    int wcols = window->columns_override ? window->columns_override :
+        window->columns;
+    int cols = (len < wcols) ? len : wcols;
+    int rows = (len + 1) / cols;
+
+    /* get the terminal widget */
+    GtkWidget *terminal = GTK_WIDGET(t);
+
+    g_object_ref(terminal);
+
+    /* remove the widget from the container temporarily */
+    gtk_container_remove(GTK_CONTAINER(window->grid), GTK_WIDGET(terminal));
+
+    /* add it back again, now resized */
+    gtk_grid_attach(GTK_GRID(window->grid), GTK_WIDGET(terminal), 0, 0, cols, rows);
+
+    /* make the terminal focused */
+    gtk_window_set_focus(GTK_WINDOW(window), GTK_WIDGET(terminal));
+
+    g_object_unref(terminal);
+
+}
+
+gboolean mssh_window_toggle_maximize(GtkWidget *widget, GObject *acceleratable,
+    guint keyval, GdkModifierType modifier, gpointer data)
+{
+
+    MSSHWindow *window = MSSH_WINDOW(data);
+
+    if (window->is_maximized) {
+        /* toggle restore */
+        mssh_window_restore_layout(widget, data);
+    } else {
+        /* toggle maximize */
+        mssh_window_maximize(widget, data);
+    }
+    return TRUE;
+}
+
+static void mssh_window_maximize(GtkWidget *widget, gpointer data)
+{
+
+    /* find the id of the currently focused window (if any) */
+    MSSHWindow *window = MSSH_WINDOW(data);
+
+    int i;
+    int idx = -1;
+    int len = window->terminals->len;
+
+    /* get the currently focused window */
+    GtkWidget *focus = gtk_window_get_focus(GTK_WINDOW(window));
+    /* save the currently focused window so we can restore it later */
+    window->last_focus = focus;
+
+    /* find the focused window in the terminal list */
+    for(i = 0; i < len; i++)
+    {
+        if(focus == GTK_WIDGET(g_array_index(window->terminals,
+            MSSHTerminal*, i)))
+        {
+            idx = i;
+            break;
+        }
+    }
+
+    if (idx == -1) {
+        /* there's no window focused, do nothing */
+    } else {
+        /* call relayout, it will reposition the widget to occupy the whole table */
+        mssh_window_relayout_for_one(window, GTK_WIDGET(g_array_index(window->terminals,
+                    MSSHTerminal*, idx)));
+        window->is_maximized = 1;
+    }
+}
+
+static void mssh_window_restore_layout(GtkWidget *widget, gpointer data)
+{
+
+    /* get the window */
+    MSSHWindow *window = MSSH_WINDOW(data);
+
+    /* just call relayout */
+    mssh_window_relayout(window);
+    window->is_maximized = 0;
+
+    /* restore the focus */
+    if (window->last_focus != NULL) {
+        gtk_window_set_focus(GTK_WINDOW(window), window->last_focus);
+    }
+
 }

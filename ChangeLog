@@ -1,6 +1,7 @@
 2014-03-14  Héctor García  <hector@debian.org>
 
 	Added support to defined backscroll lines for terminals. Patch from Balint Deak.
+	Added support to maximize a terminal (ctrl + shift + x). Patch from Balint Deak.
 
 2014-01-15  Héctor García  <hector@debian.org>
 
