@@ -202,3 +202,35 @@ void mssh_gconf_notify_modifier(GConfClient *client, guint cnxn_id,
             G_CALLBACK(mssh_window_focus), window, NULL));
     }
 }
+
+
+void mssh_gconf_backscroll_buffer_size(GConfClient *client, guint cnxn_id,
+    GConfEntry *entry, gpointer data)
+{
+    GConfValue *value;
+    gint backscroll_buffer_size;
+
+    MSSHWindow *window = MSSH_WINDOW(data);
+
+    int i;
+    int len = window->terminals->len;
+
+    value = gconf_entry_get_value(entry);
+    backscroll_buffer_size = gconf_value_get_int(value);
+
+
+    if (backscroll_buffer_size < -1)
+    {
+        backscroll_buffer_size = 5000;
+        gconf_client_set_int(client, MSSH_GCONF_KEY_BACKSCROLL_BUFFER_SIZE, backscroll_buffer_size,
+            NULL);
+    }
+
+    window->backscroll_buffer_size = backscroll_buffer_size;
+    /* reconfigure all terminals with the new size*/
+    for(i = 0; i < len; i++)
+    {
+        mssh_terminal_set_backscroll_size(g_array_index(window->terminals,
+            MSSHTerminal*, i), &backscroll_buffer_size);
+    }
+}

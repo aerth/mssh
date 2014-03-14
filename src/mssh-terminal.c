@@ -27,9 +27,16 @@ gboolean mssh_terminal_isactive(MSSHTerminal *terminal)
         GTK_CHECK_MENU_ITEM(terminal->menu_item));
 }
 
+void mssh_terminal_set_backscroll_size(MSSHTerminal *terminal, gint *backscroll_buffer_size)
+{
+    /* use scrollback buffer from gconf*/
+    vte_terminal_set_scrollback_lines(VTE_TERMINAL(terminal), *backscroll_buffer_size);
+}
 void mssh_terminal_init_session(MSSHTerminal *terminal, char *hostname)
 {
     terminal->hostname = hostname;
+    /* use scrollback buffer from gconf*/
+    mssh_terminal_set_backscroll_size(terminal, &terminal->backscroll_buffer_size);
 
     terminal->menu_item = gtk_check_menu_item_new_with_label(
         terminal->hostname);

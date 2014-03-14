@@ -75,6 +75,17 @@ static void mssh_pref_columns_select(GtkWidget *widget, gpointer data)
     gconf_client_set_int(client, MSSH_GCONF_KEY_COLUMNS, columns, NULL);
 }
 
+static void mssh_pref_backscroll_buffer_size_select(GtkWidget *widget, gpointer data)
+{
+    GConfClient *client;
+    gint backscroll_buffer_size;
+
+    client = gconf_client_get_default();
+
+    backscroll_buffer_size = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(widget));
+
+    gconf_client_set_int(client, MSSH_GCONF_KEY_BACKSCROLL_BUFFER_SIZE, backscroll_buffer_size, NULL);
+}
 static void mssh_pref_timeout_select(GtkWidget *widget, gpointer data)
 {
     GConfClient *client;
@@ -185,6 +196,11 @@ static void mssh_pref_init(MSSHPref* pref)
     GtkWidget *columns_select = gtk_spin_button_new(
         GTK_ADJUSTMENT(columns_adj), 1, 0);
 
+    GtkWidget *backscroll_buffer_size_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    GtkWidget *backscroll_buffer_size_label = gtk_label_new("Scrollback Lines:");
+    GtkAdjustment *backscroll_buffer_size_adj = gtk_adjustment_new(5000, -1, 65535, 1, 100, 0);
+    GtkWidget *backscroll_buffer_size_select = gtk_spin_button_new(
+        GTK_ADJUSTMENT(backscroll_buffer_size_adj), 1, 0);  
     GtkWidget *mod_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *mod_label = gtk_label_new("Modifier:");
     GtkWidget *mod_ctrl_check = gtk_check_button_new_with_label("Ctrl");
@@ -238,6 +254,12 @@ static void mssh_pref_init(MSSHPref* pref)
         TRUE, 0);
     gtk_box_pack_start(GTK_BOX(content), columns_hbox, FALSE, TRUE, 0);
 
+    gtk_box_pack_start(GTK_BOX(backscroll_buffer_size_hbox), backscroll_buffer_size_label, FALSE,
+        TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(backscroll_buffer_size_hbox), backscroll_buffer_size_select, FALSE,
+        TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(content), backscroll_buffer_size_hbox, FALSE, TRUE, 0);
+
     gtk_box_pack_start(GTK_BOX(mod_hbox), mod_label, FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(mod_hbox), mod_ctrl_check, FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(mod_hbox), mod_alt_check, FALSE, TRUE, 0);
@@ -268,6 +290,8 @@ static void mssh_pref_init(MSSHPref* pref)
         G_CALLBACK(mssh_pref_bg_colour_select), NULL);
     g_signal_connect(G_OBJECT(columns_select), "value-changed",
         G_CALLBACK(mssh_pref_columns_select), NULL);
+    g_signal_connect(G_OBJECT(backscroll_buffer_size_select), "value-changed",
+        G_CALLBACK(mssh_pref_backscroll_buffer_size_select), NULL);    
     g_signal_connect(G_OBJECT(timeout_select), "value-changed",
         G_CALLBACK(mssh_pref_timeout_select), NULL);
     g_signal_connect(G_OBJECT(close_check), "toggled",
@@ -313,6 +337,12 @@ static void mssh_pref_init(MSSHPref* pref)
         TRUE, NULL);
     value = gconf_entry_get_value(entry);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(columns_select),
+        gconf_value_get_int(value));
+
+    entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BACKSCROLL_BUFFER_SIZE, NULL,
+        TRUE, NULL);
+    value = gconf_entry_get_value(entry);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(backscroll_buffer_size_select),
         gconf_value_get_int(value));
 
     entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_TIMEOUT, NULL,

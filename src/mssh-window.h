@@ -35,6 +35,7 @@ typedef struct
     gint modifier;
     gint dir_focus;
     gint last_closed;
+    gint backscroll_buffer_size;
 } MSSHWindow;
 
 typedef struct

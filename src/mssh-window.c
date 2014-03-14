@@ -356,6 +356,7 @@ static void mssh_window_add_session(MSSHWindow *window, char *hostname)
 {
     MSSHTerminal *terminal = MSSH_TERMINAL(mssh_terminal_new());
 
+    terminal->backscroll_buffer_size = window->backscroll_buffer_size;
     g_array_append_val(window->terminals, terminal);
 
     g_signal_connect(G_OBJECT(terminal), "session-closed",
@@ -405,6 +406,8 @@ static void mssh_window_init(MSSHWindow* window)
     window->last_closed = -1;
 
     window->terminals = g_array_new(FALSE, TRUE, sizeof(MSSHTerminal*));
+
+    window->backscroll_buffer_size = 5000;
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_item), file_menu);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);
@@ -469,6 +472,8 @@ static void mssh_window_init(MSSHWindow* window)
         mssh_gconf_notify_dir_focus, window, NULL, NULL);
     gconf_client_notify_add(client, MSSH_GCONF_KEY_MODIFIER,
         mssh_gconf_notify_modifier, window, NULL, NULL);
+    gconf_client_notify_add(client, MSSH_GCONF_KEY_BACKSCROLL_BUFFER_SIZE,
+        mssh_gconf_backscroll_buffer_size, window, NULL, NULL);
 
     gconf_client_notify(client, MSSH_GCONF_KEY_COLUMNS);
     gconf_client_notify(client, MSSH_GCONF_KEY_TIMEOUT);
@@ -476,6 +481,7 @@ static void mssh_window_init(MSSHWindow* window)
     gconf_client_notify(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED);
     gconf_client_notify(client, MSSH_GCONF_KEY_DIR_FOCUS);
     gconf_client_notify(client, MSSH_GCONF_KEY_MODIFIER);
+    gconf_client_notify(client, MSSH_GCONF_KEY_BACKSCROLL_BUFFER_SIZE);
 
     gtk_accel_group_connect(accel, GDK_KEY_Up, window->modifier,
         GTK_ACCEL_VISIBLE, g_cclosure_new(

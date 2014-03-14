@@ -99,5 +99,16 @@
                 <long>Modifier used in focus shortcuts</long>
             </locale>
         </schema>
+        <schema>
+            <key>/schemas/apps/mssh/backscroll_buffer_size</key>
+            <applyto>/apps/mssh/backscroll_buffer_size</applyto>
+            <owner>mssh</owner>
+            <type>int</type>
+            <default>5000</default>
+            <locale name="C">
+                <short>Backscroll buffer size</short>
+                <long>Number of lines to keep for every window as a backscroll buffer. Set to -1 to make it infinite</long>
+            </locale>
+        </schema>        
     </schemalist>
 </gconfschemafile>

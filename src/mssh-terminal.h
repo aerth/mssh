@@ -23,6 +23,7 @@ typedef struct
     char *hostname;
     int started;
     int ended;
+    gint backscroll_buffer_size;
 } MSSHTerminal;
 
 typedef struct
@@ -42,6 +43,7 @@ GtkWidget* mssh_terminal_new(void);
 void mssh_terminal_destroy(MSSHTerminal *terminal);
 gboolean mssh_terminal_isactive(MSSHTerminal *terminal);
 void mssh_terminal_init_session(MSSHTerminal *terminal, char *hostname);
+void mssh_terminal_set_backscroll_size(MSSHTerminal *terminal, gint *backscroll_buffer_size);
 void mssh_terminal_start_session(MSSHTerminal *terminal, char **env);
 void mssh_terminal_send_host(MSSHTerminal *terminal);
 void mssh_terminal_send_string(MSSHTerminal *terminal, gchar *string);
