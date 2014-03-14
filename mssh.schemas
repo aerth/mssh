@@ -122,6 +122,17 @@
             </locale>
         </schema>
         <schema>
+            <key>/schemas/apps/mssh/use_pattern_expansion</key>
+            <applyto>/apps/mssh/use_pattern_expansion</applyto>
+            <owner>mssh</owner>
+            <type>bool</type>
+            <default>true</default>
+            <locale name="C">
+                <short>Allow expansion of curly braces when adding new sessions</short>
+                <long>Use curly bracket expansion when adding new sessions</long>
+            </locale>
+        </schema>              
+        <schema>
             <key>/schemas/apps/mssh/modifier</key>
             <applyto>/apps/mssh/modifier</applyto>
             <owner>mssh</owner>

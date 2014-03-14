@@ -4,7 +4,9 @@
 
 	Added support to maximize a terminal (ctrl + shift + x). Patch from Balint Deak.
 
-    Added support to change bg y fg colors on selected terminal. Patch from Balint Deak.
+	Added support to change bg y fg colors on selected terminal. Patch from Balint Deak.
+
+	Added support to create a new session. Patch from Balint Deak.
 
 2014-01-15  Héctor García  <hector@debian.org>
 

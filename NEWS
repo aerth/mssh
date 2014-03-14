@@ -1,4 +1,6 @@
 2014-03-14
-    New ctrl + shift +x combination to maximize a terminal
+    New ctrl + shift + x combination to maximize a terminal.
+
+    New ctrl + shift + n combinatio to add a new server.
 
     Now you can have different colors on select terminal. MUST update mssh.schema or mssh will crash.

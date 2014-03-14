@@ -1,8 +1,10 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <gconf/gconf-client.h>
 #include <gdk/gdkkeysyms.h>
+#include <gtk/gtk.h>
 
 #include "mssh-terminal.h"
 #include "mssh-pref.h"
@@ -10,6 +12,8 @@
 #include "mssh-window.h"
 
 #include "config.h"
+
+#include <regex.h>  
 
 static void mssh_window_sendhost(GtkWidget *widget, gpointer data);
 static void mssh_window_destroy(GtkWidget *widget, gpointer data);
@@ -26,6 +30,9 @@ static void mssh_window_insert(GtkWidget *widget, gchar *new_text,
 static void mssh_window_add_session(MSSHWindow *window, char *hostname);
 static void mssh_window_init(MSSHWindow* window);
 static void mssh_window_class_init(MSSHWindowClass *klass);
+static void mssh_window_add(GtkWidget *widget, gpointer data);
+gboolean mssh_window_dialog_emit_response(GtkWidget *widget, GObject *acceleratable,
+    guint keyval, GdkModifierType modifier, gpointer data);
 static void mssh_window_maximize(GtkWidget *widget, gpointer data);
 static void mssh_window_restore_layout(GtkWidget *widget, gpointer data);
 void mssh_window_relayout_for_one(MSSHWindow *window, GtkWidget *t);
@@ -441,8 +448,8 @@ static void mssh_window_init(MSSHWindow* window)
         GTK_STOCK_QUIT, NULL);
     GtkWidget *file_sendhost = gtk_image_menu_item_new_with_label(
         "Send hostname");
-/*  GtkWidget *file_add = gtk_image_menu_item_new_with_label(
-        "Add session");*/
+    GtkWidget *file_add = gtk_menu_item_new_with_label(
+        "Add session");
 
     GtkWidget *edit_pref = gtk_image_menu_item_new_from_stock(
         GTK_STOCK_PREFERENCES, NULL);
@@ -470,12 +477,14 @@ static void mssh_window_init(MSSHWindow* window)
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(server_item),
         window->server_menu);
 
-/*  gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_add);*/
+    gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_add);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_sendhost);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_quit);
     gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_pref);
     g_signal_connect(G_OBJECT(file_sendhost), "activate",
         G_CALLBACK(mssh_window_sendhost), window);
+    g_signal_connect(G_OBJECT(file_add), "activate",
+        G_CALLBACK(mssh_window_add), window);
     g_signal_connect(G_OBJECT(file_quit), "activate",
         G_CALLBACK(mssh_window_destroy), window);
     g_signal_connect(G_OBJECT(edit_pref), "activate",
@@ -563,6 +572,11 @@ static void mssh_window_init(MSSHWindow* window)
     gtk_accel_group_connect(accel, GDK_KEY_x, GDK_CONTROL_MASK | GDK_SHIFT_MASK,
         GTK_ACCEL_VISIBLE, g_cclosure_new(
         G_CALLBACK(mssh_window_toggle_maximize), window, NULL));
+
+    /* bind Ctrl + Shift + N to show the dialog for adding new sessions */
+    gtk_accel_group_connect(accel, GDK_KEY_n, GDK_CONTROL_MASK | GDK_SHIFT_MASK,
+        GTK_ACCEL_VISIBLE, g_cclosure_new(
+        G_CALLBACK(mssh_window_add), window, NULL));
 
     window->accel = accel;
 
@@ -733,4 +747,78 @@ static void mssh_window_restore_layout(GtkWidget *widget, gpointer data)
             TRUE, NULL);
         mssh_gconf_notify_bg_colour_focus(client, 0, entry, window);
 	}
+}
+
+/* show a popup window for adding new sessions  */
+static void mssh_window_add(GtkWidget *widget, gpointer data)
+{
+
+    MSSHWindow *window = MSSH_WINDOW(data);
+    GtkWidget *dialog, *label, *content_area, *button_add;
+	GtkWidget *new_session_entry;
+	gint result;
+    
+    /* create new dialog */
+    dialog = gtk_dialog_new();
+    /* get the content area that will be packed */
+    content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+
+    /* label for text */
+    label = gtk_label_new ("Add new session with hostname: ");
+
+    /* Add the label and entry, and show everything we've added to the dialog */
+    new_session_entry = gtk_entry_new();
+    gtk_entry_set_max_length (GTK_ENTRY(new_session_entry), 255);
+
+    /* pack the widgets */
+    gtk_container_add (GTK_CONTAINER (content_area), label);
+    gtk_container_add (GTK_CONTAINER (content_area), new_session_entry);
+    /* add two buttons */
+    button_add = gtk_dialog_add_button(GTK_DIALOG(dialog), "Add", GTK_RESPONSE_ACCEPT);
+    gtk_dialog_add_button(GTK_DIALOG(dialog), "Cancel", GTK_RESPONSE_CANCEL);
+    /* make the add button the default */
+    gtk_widget_grab_default(button_add);
+    /* set dialog properties (modal, etc) */
+    gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
+    gtk_window_set_destroy_with_parent(GTK_WINDOW(dialog), TRUE);
+    gtk_window_set_transient_for (GTK_WINDOW(dialog), GTK_WINDOW(window));
+    /* set it's title */
+    gtk_window_set_title(GTK_WINDOW(dialog), "Add new session");
+
+    /* catch the activate signal (hitting enter) */
+    g_signal_connect(G_OBJECT(new_session_entry), "activate",
+        G_CALLBACK(mssh_window_dialog_emit_response), window);
+
+    /* show the dialog and it's widgets */
+    gtk_widget_show_all (dialog);
+
+    /* wait for input */
+    result = gtk_dialog_run (GTK_DIALOG (dialog));
+    switch (result)
+      {
+        case GTK_RESPONSE_ACCEPT:
+           mssh_window_add_session(window, (gchar*) gtk_entry_get_text(GTK_ENTRY(new_session_entry)));
+           /* relayout */
+           mssh_window_relayout(window);
+           break;
+        default:
+           /* do nothing */
+           break;
+      }
+    gtk_widget_destroy (dialog);
+}
+
+/* catch the 'activate' signal of the entry (return has been pushed)  */
+/* emit the response for accept, simulating a mouse click on the add button  */
+gboolean mssh_window_dialog_emit_response(GtkWidget *widget, GObject *acceleratable,
+    guint keyval, GdkModifierType modifier, gpointer data)
+{
+
+    /* get the dialog by getting the parent of the parent for the emitting (entry) widget */
+    GtkWidget *vbox = gtk_widget_get_parent(widget);
+    GtkWidget *dialog = gtk_widget_get_parent(vbox);
+    /* emit the response signal simulating the clicking of 'ok'  */
+    gtk_dialog_response (GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
+
+    return TRUE;
 }
