@@ -63,6 +63,36 @@ static void mssh_pref_bg_colour_select(GtkWidget *widget, gpointer data)
         NULL);
 }
 
+static void mssh_pref_fg_colour_select_focus(GtkWidget *widget, gpointer data)
+{
+    GConfClient *client;
+    GdkRGBA colour;
+    const gchar *colour_s;
+
+    client = gconf_client_get_default();
+
+    gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &colour);
+    colour_s = gdk_rgba_to_string(&colour);
+
+
+    gconf_client_set_string(client, MSSH_GCONF_KEY_FG_COLOUR_FOCUS, colour_s,
+        NULL);
+}
+
+static void mssh_pref_bg_colour_select_focus(GtkWidget *widget, gpointer data)
+{
+    GConfClient *client;
+    GdkRGBA colour;
+    const gchar *colour_s;
+
+    client = gconf_client_get_default();
+
+    gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &colour);
+    colour_s = gdk_rgba_to_string(&colour);
+
+    gconf_client_set_string(client, MSSH_GCONF_KEY_BG_COLOUR_FOCUS, colour_s,
+        NULL);
+}
 static void mssh_pref_columns_select(GtkWidget *widget, gpointer data)
 {
     GConfClient *client;
@@ -110,6 +140,17 @@ static void mssh_pref_close_check(GtkWidget *widget, gpointer data)
     gconf_client_set_bool(client, MSSH_GCONF_KEY_CLOSE_ENDED, close, NULL);
 }
 
+static void mssh_pref_recolor_focused_check(GtkWidget *widget, gpointer data)
+{
+    GConfClient *client;
+    gboolean recolor_focused;
+
+    client = gconf_client_get_default();
+
+    recolor_focused = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+
+    gconf_client_set_bool(client, MSSH_GCONF_KEY_RECOLOR_FOCUSED, recolor_focused, NULL);
+}
 static void mssh_pref_exit_check(GtkWidget *widget, gpointer data)
 {
     GConfClient *client;
@@ -177,6 +218,14 @@ static void mssh_pref_init(MSSHPref* pref)
     GtkWidget *fg_colour_label = gtk_label_new("Foreground:");
     GtkWidget *fg_colour_select = gtk_color_button_new();
 
+    GtkWidget *recolor_focused_check = gtk_check_button_new_with_label(
+        "Use different color for focused window");
+
+    GtkWidget *colour_table_focus = gtk_grid_new();
+    GtkWidget *bg_colour_label_focus = gtk_label_new("Background for focused window:");
+    GtkWidget *bg_colour_select_focus = gtk_color_button_new();
+    GtkWidget *fg_colour_label_focus = gtk_label_new("Foreground for focused window:");
+    GtkWidget *fg_colour_select_focus = gtk_color_button_new();
     GtkWidget *exit_check = gtk_check_button_new_with_label(
         "Quit after all sessions have ended");
     GtkWidget *close_check = gtk_check_button_new_with_label(
@@ -236,6 +285,17 @@ static void mssh_pref_init(MSSHPref* pref)
         1, 1, 1, 1);
     gtk_box_pack_start(GTK_BOX(content), colour_table, FALSE, TRUE, 0);
 
+    gtk_box_pack_start(GTK_BOX(content), recolor_focused_check, FALSE, TRUE, 0);
+
+    gtk_grid_attach(GTK_GRID(colour_table_focus), bg_colour_label_focus,
+        0, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(colour_table_focus), bg_colour_select_focus,
+        1, 0, 1, 1);
+    gtk_grid_attach(GTK_GRID(colour_table_focus), fg_colour_label_focus,
+        0, 1, 1, 1);
+    gtk_grid_attach(GTK_GRID(colour_table_focus), fg_colour_select_focus,
+        1, 1, 1, 1);
+    gtk_box_pack_start(GTK_BOX(content), colour_table_focus, FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(content), exit_check, FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(content), close_check, FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(content), dir_focus_check, FALSE, TRUE, 0);
@@ -288,6 +348,10 @@ static void mssh_pref_init(MSSHPref* pref)
         G_CALLBACK(mssh_pref_fg_colour_select), NULL);
     g_signal_connect(G_OBJECT(bg_colour_select), "color-set",
         G_CALLBACK(mssh_pref_bg_colour_select), NULL);
+    g_signal_connect(G_OBJECT(fg_colour_select_focus), "color-set",
+        G_CALLBACK(mssh_pref_fg_colour_select_focus), NULL);
+    g_signal_connect(G_OBJECT(bg_colour_select_focus), "color-set",
+        G_CALLBACK(mssh_pref_bg_colour_select_focus), NULL);
     g_signal_connect(G_OBJECT(columns_select), "value-changed",
         G_CALLBACK(mssh_pref_columns_select), NULL);
     g_signal_connect(G_OBJECT(backscroll_buffer_size_select), "value-changed",
@@ -296,6 +360,8 @@ static void mssh_pref_init(MSSHPref* pref)
         G_CALLBACK(mssh_pref_timeout_select), NULL);
     g_signal_connect(G_OBJECT(close_check), "toggled",
         G_CALLBACK(mssh_pref_close_check), NULL);
+    g_signal_connect(G_OBJECT(recolor_focused_check), "toggled",
+        G_CALLBACK(mssh_pref_recolor_focused_check), NULL);
     g_signal_connect(G_OBJECT(exit_check), "toggled",
         G_CALLBACK(mssh_pref_exit_check), NULL);
      g_signal_connect(G_OBJECT(dir_focus_check), "toggled",
@@ -333,6 +399,22 @@ static void mssh_pref_init(MSSHPref* pref)
     gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(bg_colour_select),
         &colour);
 
+    entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FG_COLOUR_FOCUS, NULL,
+        TRUE, NULL);
+    value = gconf_entry_get_value(entry);
+    colour_s = gconf_value_get_string(value);
+    gdk_rgba_parse(&colour, colour_s);
+    gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(fg_colour_select_focus),
+        &colour);
+
+    entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BG_COLOUR_FOCUS, NULL,
+        TRUE, NULL);
+    value = gconf_entry_get_value(entry);
+    colour_s = gconf_value_get_string(value);
+    gdk_rgba_parse(&colour, colour_s);
+    gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(bg_colour_select_focus),
+        &colour);
+
     entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_COLUMNS, NULL,
         TRUE, NULL);
     value = gconf_entry_get_value(entry);
@@ -355,6 +437,12 @@ static void mssh_pref_init(MSSHPref* pref)
         NULL, TRUE, NULL);
     value = gconf_entry_get_value(entry);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(close_check),
+        gconf_value_get_bool(value));
+
+    entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_RECOLOR_FOCUSED,
+        NULL, TRUE, NULL);
+    value = gconf_entry_get_value(entry);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(recolor_focused_check),
         gconf_value_get_bool(value));
 
     entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED,

@@ -34,6 +34,39 @@
             </locale>
         </schema>
         <schema>
+            <key>/schemas/apps/mssh/recolor_focused</key>
+            <applyto>/apps/mssh/recolor_focused</applyto>
+            <owner>mssh</owner>
+            <type>bool</type>
+            <default>true</default>
+            <locale name="C">
+                <short>Recolor focused window</short>
+                <long>Use different Back- and Foreground color for focused window</long>
+            </locale>
+        </schema>
+        <schema>
+            <key>/schemas/apps/mssh/fg_colour_focus</key>
+            <applyto>/apps/mssh/fg_colour_focus</applyto>
+            <owner>mssh</owner>
+            <type>string</type>
+            <default>#ffffffffffff</default>
+            <locale name="C">
+                <short>Terminal foreground colour for the focused window</short>
+                <long>Foreground colour to use for the currently focused MSSH terminal</long>
+            </locale>
+        </schema>
+        <schema>
+            <key>/schemas/apps/mssh/bg_colour_focus</key>
+            <applyto>/apps/mssh/bg_colour_focus</applyto>
+            <owner>mssh</owner>
+            <type>string</type>
+            <default>#000000000000</default>
+            <locale name="C">
+                <short>Terminal background colour for the focused window</short>
+                <long>Background colour to use for the currently focused MSSH terminal</long>
+            </locale>
+        </schema>
+        <schema>
             <key>/schemas/apps/mssh/coloums</key>
             <applyto>/apps/mssh/columns</applyto>
             <owner>mssh</owner>

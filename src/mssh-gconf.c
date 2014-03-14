@@ -66,6 +66,80 @@ void mssh_gconf_notify_bg_colour(GConfClient *client, guint cnxn_id,
     }
 }
 
+void mssh_gconf_notify_fg_colour_focus(GConfClient *client, guint cnxn_id,
+    GConfEntry *entry, gpointer data)
+{
+    GConfValue *value;
+    const gchar *colour_s;
+    GdkRGBA colour;
+    int i;
+    int idx = -1;
+    GtkWidget *focus;
+
+    MSSHWindow *window = MSSH_WINDOW(data);
+
+    value = gconf_entry_get_value(entry);
+    colour_s = gconf_value_get_string(value);
+    gdk_rgba_parse(&colour, colour_s);
+
+    /* get the currently focused window */
+	focus = gtk_window_get_focus(GTK_WINDOW(window));
+
+    /* find the focused window in the terminal list */
+    for(i = 0; i < window->terminals->len; i++)
+    {
+        if(focus == GTK_WIDGET(g_array_index(window->terminals,
+            MSSHTerminal*, i)))
+        {
+            idx = i;
+            break;
+        }
+    }
+
+    if (idx != -1) {
+        /* found the currently focused terminal, update the color */
+        vte_terminal_set_color_foreground_rgba(VTE_TERMINAL(g_array_index(
+            window->terminals, MSSHTerminal*, idx)), &colour);
+    }
+}
+
+void mssh_gconf_notify_bg_colour_focus(GConfClient *client, guint cnxn_id,
+    GConfEntry *entry, gpointer data)
+{
+    GConfValue *value;
+    const gchar *colour_s;
+    GdkRGBA colour;
+    int i;
+    int idx = -1;
+	GtkWidget *focus;
+
+    MSSHWindow *window = MSSH_WINDOW(data);
+
+    value = gconf_entry_get_value(entry);
+    colour_s = gconf_value_get_string(value);
+    gdk_rgba_parse(&colour, colour_s);
+
+    /* get the currently focused window */
+    focus = gtk_window_get_focus(GTK_WINDOW(window));
+
+    /* find the focused window in the terminal list */
+    for(i = 0; i < window->terminals->len; i++)
+    {
+        if(focus == GTK_WIDGET(g_array_index(window->terminals,
+            MSSHTerminal*, i)))
+        {
+            idx = i;
+            break;
+        }
+    }
+
+    if (idx != -1) {
+        /* found the currently focused terminal, update the color */
+        vte_terminal_set_color_background_rgba(VTE_TERMINAL(g_array_index(
+            window->terminals, MSSHTerminal*, idx)), &colour);
+    }
+
+}
 void mssh_gconf_notify_columns(GConfClient *client, guint cnxn_id,
     GConfEntry *entry, gpointer data)
 {
@@ -137,6 +211,21 @@ void mssh_gconf_notify_close_ended(GConfClient *client, guint cnxn_id,
             }
         }
     }
+}
+
+void mssh_gconf_notify_recolor_focused(GConfClient *client, guint cnxn_id,
+    GConfEntry *entry, gpointer data)
+{
+    GConfValue *value;
+    gboolean recolor_focused;
+
+    MSSHWindow *window = MSSH_WINDOW(data);
+
+    value = gconf_entry_get_value(entry);
+    recolor_focused = gconf_value_get_bool(value);
+
+    window->recolor_focused = recolor_focused;
+
 }
 
 void mssh_gconf_notify_quit_all_ended(GConfClient *client, guint cnxn_id,

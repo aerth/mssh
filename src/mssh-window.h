@@ -38,6 +38,7 @@ typedef struct
     gint backscroll_buffer_size;
     GtkWidget *last_focus;
     int is_maximized;
+    gboolean recolor_focused;
 } MSSHWindow;
 
 typedef struct

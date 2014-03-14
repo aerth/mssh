@@ -109,11 +109,22 @@ static gboolean mssh_window_key_press(GtkWidget *widget,
 static gboolean mssh_window_entry_focused(GtkWidget *widget,
     GtkDirectionType dir, gpointer data)
 {
+    GConfClient *client;
+    GConfEntry *entry;
     MSSHWindow *window = MSSH_WINDOW(data);
 
     gtk_window_set_title(GTK_WINDOW(window), PACKAGE_NAME" - All");
     window->last_focus = NULL;
 
+    /* clear the coloring for the focused window */
+    client = gconf_client_get_default();
+
+    entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FG_COLOUR, NULL,
+        TRUE, NULL);
+    mssh_gconf_notify_fg_colour(client, 0, entry, window);
+    entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BG_COLOUR, NULL,
+        TRUE, NULL);
+    mssh_gconf_notify_bg_colour(client, 0, entry, window);
     return FALSE;
 }
 
@@ -122,6 +133,8 @@ gboolean mssh_window_focus(GtkWidget *widget, GObject *acceleratable,
 {
     MSSHWindow *window = MSSH_WINDOW(data);
     GtkWidget *focus;
+    GConfClient *client;
+    GConfEntry *entry;
 
     int i, idx = -1, len = window->terminals->len;
     int wcols = window->columns_override ? window->columns_override :
@@ -140,6 +153,17 @@ gboolean mssh_window_focus(GtkWidget *widget, GObject *acceleratable,
         }
     }
 
+    client = gconf_client_get_default();
+
+    /* recolor the windows */
+    if (window->recolor_focused) {
+        entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FG_COLOUR, NULL,
+            TRUE, NULL);
+        mssh_gconf_notify_fg_colour(client, 0, entry, window);
+        entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BG_COLOUR, NULL,
+            TRUE, NULL);
+        mssh_gconf_notify_bg_colour(client, 0, entry, window);
+    }
     if(focus == window->global_entry && keyval == GDK_KEY_Down &&
         window->dir_focus)
         idx = 0;
@@ -261,6 +285,8 @@ static void mssh_window_session_focused(MSSHTerminal *terminal,
     char *title;
     size_t len;
 
+    GConfClient *client;
+    GConfEntry *entry;
     MSSHWindow *window = MSSH_WINDOW(data);
 
     len = strlen(PACKAGE_NAME" - ") + strlen(terminal->hostname) + 1;
@@ -271,6 +297,25 @@ static void mssh_window_session_focused(MSSHTerminal *terminal,
     gtk_window_set_title(GTK_WINDOW(window), title);
 
     free(title);
+    client = gconf_client_get_default();
+
+    /* recolor all windows */
+    entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FG_COLOUR, NULL,
+        TRUE, NULL);
+    mssh_gconf_notify_fg_colour(client, 0, entry, window);
+    entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BG_COLOUR, NULL,
+        TRUE, NULL);
+    mssh_gconf_notify_bg_colour(client, 0, entry, window);
+
+    /* recolor the focused window - if needed */
+    if (window->recolor_focused && window->is_maximized == 0) {
+        entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FG_COLOUR_FOCUS, NULL,
+            TRUE, NULL);
+        mssh_gconf_notify_fg_colour_focus(client, 0, entry, window);
+        entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BG_COLOUR_FOCUS, NULL,
+            TRUE, NULL);
+        mssh_gconf_notify_bg_colour_focus(client, 0, entry, window);
+    }
 }
 
 void mssh_window_relayout(MSSHWindow *window)
@@ -418,6 +463,8 @@ static void mssh_window_init(MSSHWindow* window)
 
     window->is_maximized = 0;
 
+   window->recolor_focused = FALSE;
+
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(file_item), file_menu);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit_item), edit_menu);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(server_item),
@@ -469,12 +516,18 @@ static void mssh_window_init(MSSHWindow* window)
         mssh_gconf_notify_fg_colour, window, NULL, NULL);
     gconf_client_notify_add(client, MSSH_GCONF_KEY_BG_COLOUR,
         mssh_gconf_notify_bg_colour, window, NULL, NULL);
+    gconf_client_notify_add(client, MSSH_GCONF_KEY_FG_COLOUR_FOCUS,
+        mssh_gconf_notify_fg_colour_focus, window, NULL, NULL);
+    gconf_client_notify_add(client, MSSH_GCONF_KEY_BG_COLOUR_FOCUS,
+        mssh_gconf_notify_bg_colour_focus, window, NULL, NULL);
     gconf_client_notify_add(client, MSSH_GCONF_KEY_COLUMNS,
         mssh_gconf_notify_columns, window, NULL, NULL);
     gconf_client_notify_add(client, MSSH_GCONF_KEY_TIMEOUT,
         mssh_gconf_notify_timeout, window, NULL, NULL);
     gconf_client_notify_add(client, MSSH_GCONF_KEY_CLOSE_ENDED,
         mssh_gconf_notify_close_ended, window, NULL, NULL);
+    gconf_client_notify_add(client, MSSH_GCONF_KEY_RECOLOR_FOCUSED,
+        mssh_gconf_notify_recolor_focused, window, NULL, NULL);
     gconf_client_notify_add(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED,
         mssh_gconf_notify_quit_all_ended, window, NULL, NULL);
     gconf_client_notify_add(client, MSSH_GCONF_KEY_DIR_FOCUS,
@@ -487,6 +540,7 @@ static void mssh_window_init(MSSHWindow* window)
     gconf_client_notify(client, MSSH_GCONF_KEY_COLUMNS);
     gconf_client_notify(client, MSSH_GCONF_KEY_TIMEOUT);
     gconf_client_notify(client, MSSH_GCONF_KEY_CLOSE_ENDED);
+    gconf_client_notify(client, MSSH_GCONF_KEY_RECOLOR_FOCUSED);
     gconf_client_notify(client, MSSH_GCONF_KEY_QUIT_ALL_ENDED);
     gconf_client_notify(client, MSSH_GCONF_KEY_DIR_FOCUS);
     gconf_client_notify(client, MSSH_GCONF_KEY_MODIFIER);
@@ -548,6 +602,8 @@ static void mssh_window_class_init(MSSHWindowClass *klass)
 void mssh_window_relayout_for_one(MSSHWindow *window, GtkWidget *t)
 {
 
+    GConfClient *client;
+    GConfEntry *entry;
     int len = window->terminals->len;
     int wcols = window->columns_override ? window->columns_override :
         window->columns;
@@ -567,6 +623,19 @@ void mssh_window_relayout_for_one(MSSHWindow *window, GtkWidget *t)
 
     /* make the terminal focused */
     gtk_window_set_focus(GTK_WINDOW(window), GTK_WIDGET(terminal));
+
+    /* remove the coloring */
+    if (window->recolor_focused) {
+
+        client = gconf_client_get_default();
+
+        entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FG_COLOUR, NULL,
+            TRUE, NULL);
+        mssh_gconf_notify_fg_colour(client, 0, entry, window);
+        entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BG_COLOUR, NULL,
+            TRUE, NULL);
+        mssh_gconf_notify_bg_colour(client, 0, entry, window);
+    }
 
     g_object_unref(terminal);
 
@@ -597,6 +666,8 @@ static void mssh_window_maximize(GtkWidget *widget, gpointer data)
     int i;
     int idx = -1;
     int len = window->terminals->len;
+    GConfClient *client;
+    GConfEntry *entry;
 
     /* get the currently focused window */
     GtkWidget *focus = gtk_window_get_focus(GTK_WINDOW(window));
@@ -614,6 +685,17 @@ static void mssh_window_maximize(GtkWidget *widget, gpointer data)
         }
     }
 
+    /* recolor the window with the normal color */
+    if (window->recolor_focused) {
+        client = gconf_client_get_default();
+
+        entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FG_COLOUR, NULL,
+            TRUE, NULL);
+        mssh_gconf_notify_fg_colour(client, 0, entry, window);
+        entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BG_COLOUR, NULL,
+            TRUE, NULL);
+        mssh_gconf_notify_bg_colour(client, 0, entry, window);
+    }
     if (idx == -1) {
         /* there's no window focused, do nothing */
     } else {
@@ -627,6 +709,8 @@ static void mssh_window_maximize(GtkWidget *widget, gpointer data)
 static void mssh_window_restore_layout(GtkWidget *widget, gpointer data)
 {
 
+    GConfClient *client;
+    GConfEntry *entry;
     /* get the window */
     MSSHWindow *window = MSSH_WINDOW(data);
 
@@ -639,4 +723,14 @@ static void mssh_window_restore_layout(GtkWidget *widget, gpointer data)
         gtk_window_set_focus(GTK_WINDOW(window), window->last_focus);
     }
 
+    /* recolor the focused window - if needed */
+    client = gconf_client_get_default();
+    if (window->recolor_focused && window->is_maximized == 0) {
+        entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_FG_COLOUR_FOCUS, NULL,
+            TRUE, NULL);
+        mssh_gconf_notify_fg_colour_focus(client, 0, entry, window);
+        entry = gconf_client_get_entry(client, MSSH_GCONF_KEY_BG_COLOUR_FOCUS, NULL,
+            TRUE, NULL);
+        mssh_gconf_notify_bg_colour_focus(client, 0, entry, window);
+	}
 }
