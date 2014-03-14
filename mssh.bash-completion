@@ -1,0 +1,38 @@
+# bash completion for mssh
+# Written by Héctor García <hector@debian.org>
+
+_mssh_alias()
+{
+  if [ -f ~/.mssh_clusters ]; then
+    COMPREPLY=( $( compgen -W '$( command cat ~/.mssh_clusters 2>/dev/null \
+       | grep -v "^\s*$" | grep -v "^#" | sed -e "s/:.*$//" )' -- $cur ) )
+  fi
+
+  return 0
+}  
+
+_mssh()
+{
+  local cur=${COMP_WORDS[COMP_CWORD]} 
+  local prev=${COMP_WORDS[COMP_CWORD-1]}
+
+  COMPREPLY=()
+
+  case "$prev" in
+   -a)
+     _mssh_alias
+     return 0
+     ;;
+  esac
+
+  # completing -a option
+  if [[ "$cur" == -* ]]; then
+    COMPREPLY=( $( compgen -W "-a" -- $cur ) )
+    return 0
+  fi
+
+  _known_hosts_real "$cur"
+
+}
+
+complete -F _mssh mssh

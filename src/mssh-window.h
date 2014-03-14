@@ -23,6 +23,7 @@ typedef struct
     GtkWindow widget;
     GtkWidget *grid;
     GtkWidget *server_menu;
+    GtkWidget *command_menu;
     GtkWidget *global_entry;
     GtkAccelGroup *accel;
     GArray *terminals;
@@ -39,6 +40,7 @@ typedef struct
     GtkWidget *last_focus;
     int is_maximized;
     gboolean recolor_focused;
+    GData **commands;
 } MSSHWindow;
 
 typedef struct
@@ -51,6 +53,7 @@ GType mssh_window_get_type(void) G_GNUC_CONST;
 GtkWidget* mssh_window_new(void);
 void mssh_window_start_session(MSSHWindow* window, char **env,
     GArray *hosts, long cols);
+void mssh_window_add_command(GQuark key_id, gpointer data, gpointer user_data);
 void mssh_window_relayout(MSSHWindow *window);
 void mssh_window_session_closed(MSSHTerminal *terminal, gpointer data);
 gboolean mssh_window_focus(GtkWidget *widget, GObject *acceleratable,

@@ -47,23 +47,36 @@ void mssh_terminal_init_session(MSSHTerminal *terminal, char *hostname)
 
 void mssh_terminal_start_session(MSSHTerminal *terminal, char **env)
 {
-    char *args[3];
+    char *args[5];
+    char *fullhost;
+    char *host = NULL;
+    char *port = NULL;
+
+    fullhost = strdup(terminal->hostname);
+    host = strtok(fullhost, ":");
+    port = strtok(NULL, "");
 
     args[0] = strdup("ssh");
-    args[1] = terminal->hostname;
-    args[2] = NULL;
+    args[1] = host;
 
-    vte_terminal_fork_command_full(  VTE_TERMINAL(terminal), 
-                                     VTE_PTY_DEFAULT,
-                                     NULL,  /* working dir */
-                                     args,
-                                     env, 
-                                     G_SPAWN_SEARCH_PATH,
-                                     NULL,  /* child_setup */
-                                     NULL,  /* child_setup_data */
-                                     NULL,  /* *child_pid */
-                                     NULL); /* Error handling */
+    if (!port)
+        args[2] = NULL;
+    else {
+         args[2] = strdup("-p");
+         args[3] = port;
+         args[4] = NULL;
+    }
 
+    vte_terminal_fork_command_full(VTE_TERMINAL(terminal),
+                                   VTE_PTY_NO_LASTLOG|VTE_PTY_NO_UTMP|VTE_PTY_NO_WTMP,
+                                   NULL,  /* working dir */
+                                   args,
+                                   env,
+                                   G_SPAWN_SEARCH_PATH,
+                                   NULL,  /* child_setup */
+                                   NULL,  /* child_setup_data */
+                                   NULL,  /* *child_pid */
+                                   NULL); /* Error handling */
 
     free(args[0]);
 }

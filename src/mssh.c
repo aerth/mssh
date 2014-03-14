@@ -121,6 +121,12 @@ GData **parse_aliases(char *conffile)
         if(strcmp(line, "") == 0)
             continue;
 
+        if(*line == '#')
+            continue;
+
+        if(*line == '{')
+            continue;
+
         if((sep = strchr(line, ':')) == NULL)
         {
             printf("Line %d: Failed to parse line '%s'\n", lineno, line);
@@ -159,6 +165,65 @@ GData **parse_aliases(char *conffile)
     return aliases;
 }
 
+GData **parse_commands(char *conffile)
+{
+    FILE *file;
+    char *line;
+    int lineno = 0;
+
+    GData **commands = malloc(sizeof(GData*));
+    g_datalist_init(commands);
+
+    if((file = fopen(conffile, "r")) == NULL)
+        return commands;
+
+    while((line = fgetline(file)) != NULL)
+    {
+        char *sep, *command, *commandline;
+
+        lineno++;
+
+        if(strcmp(line, "") == 0)
+            continue;
+
+        if(*line == '#')
+            continue;
+
+        if(*line != '{')
+            continue;
+
+        if((sep = strchr(line, '}')) == NULL)
+        {
+            printf("Line %d: Failed to parse line '%s'\n", lineno, line);
+            exit(EXIT_FAILURE);
+        }
+
+        *sep = '\0';
+        command = line + 1;
+
+        if((commandline = index(sep + 1, ' ')) == NULL)
+        {
+            printf("Line %d: Command Alias '%s' specifies no command\n", lineno,
+                command);
+            exit(EXIT_FAILURE);
+        }
+        while ( *commandline == ' ' ) { commandline++; }
+
+        sep = commandline;
+        while ( ( sep = index(sep, '\\') ) != NULL ) {
+            if ( *(sep+1) == 'n' ) {
+                *sep = ' ';
+                *(sep+1) = '\n';
+            }
+            sep++;
+        }
+
+        g_datalist_set_data(commands, command, commandline);
+    }
+
+    return commands;
+}
+
 int main(int argc, char* argv[], char* env[])
 {
     GtkWidget* window;
@@ -166,6 +231,7 @@ int main(int argc, char* argv[], char* env[])
     char *home, *conffile;
     long cols = 0;
     GData **aliases = NULL;
+    GData **commands = NULL;
     GArray *hosts = NULL;
 
     static struct option long_options[] =
@@ -185,6 +251,7 @@ int main(int argc, char* argv[], char* env[])
         snprintf(conffile, len, "%s/%s", home, CONFFILE);
 
         aliases = parse_aliases(conffile);
+        commands = parse_commands(conffile);
         free(conffile);
     }
     else
@@ -286,7 +353,10 @@ int main(int argc, char* argv[], char* env[])
     g_signal_connect(G_OBJECT(window), "destroy",
         G_CALLBACK(on_mssh_destroy), NULL);
 
+    MSSH_WINDOW(window)->commands = commands;
+
     mssh_window_start_session(MSSH_WINDOW(window), env, hosts, cols);
+    g_datalist_foreach(commands, mssh_window_add_command, window);
 
     gtk_widget_show_all(window);
     gtk_main();
