@@ -201,11 +201,21 @@ GData **parse_commands(char *conffile)
         *sep = '\0';
         command = line + 1;
 
-        if((commandline = strtok(sep + 1, " ")) == NULL)
+        if((commandline = index(sep + 1, ' ')) == NULL)
         {
             printf("Line %d: Command Alias '%s' specifies no command\n", lineno,
                 command);
             exit(EXIT_FAILURE);
+        }
+        while ( *commandline == ' ' ) { commandline++; }
+
+        sep = commandline;
+        while ( ( sep = index(sep, '\\') ) != NULL ) {
+            if ( *(sep+1) == 'n' ) {
+                *sep = ' ';
+                *(sep+1) = '\n';
+            }
+            sep++;
         }
 
         g_datalist_set_data(commands, command, commandline);
@@ -343,9 +353,10 @@ int main(int argc, char* argv[], char* env[])
     g_signal_connect(G_OBJECT(window), "destroy",
         G_CALLBACK(on_mssh_destroy), NULL);
 
+    MSSH_WINDOW(window)->commands = commands;
+
     mssh_window_start_session(MSSH_WINDOW(window), env, hosts, cols);
     g_datalist_foreach(commands, mssh_window_add_command, window);
-    MSSH_WINDOW(window)->commands = commands;
 
     gtk_widget_show_all(window);
     gtk_main();
