@@ -1,3 +1,7 @@
+2014-03-17  Héctor García  <hector@debian.org>
+
+	Release as mssh 2.0
+
 2014-03-14  Héctor García  <hector@debian.org>
 
 	Added support to defined backscroll lines for terminals. Patch from Balint Deak.
