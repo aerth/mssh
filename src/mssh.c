@@ -4,6 +4,9 @@
 #include <getopt.h>
 #include <errno.h>
 
+#define GETTEXT_PACKAGE "gtk20"
+#include <glib/gi18n-lib.h>
+
 #include <gtk/gtk.h>
 
 #include "config.h"
@@ -242,6 +245,10 @@ int main(int argc, char* argv[], char* env[])
         {"version", no_argument,        0, 'V'},
         {0, 0, 0, 0}
     };
+
+    bindtextdomain(GETTEXT_PACKAGE, PROGRAMNAME_LOCALEDIR);
+    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+    textdomain(GETTEXT_PACKAGE);
 
     if((home = getenv("HOME")) != NULL)
     {

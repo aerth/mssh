@@ -6,6 +6,9 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
+#define GETTEXT_PACKAGE "gtk20"
+#include <glib/gi18n-lib.h>
+
 #include "mssh-terminal.h"
 #include "mssh-pref.h"
 #include "mssh-gconf.h"
@@ -470,20 +473,20 @@ static void mssh_window_init(MSSHWindow* window)
     GtkWidget *file_menu = gtk_menu_new();
     GtkWidget *edit_menu = gtk_menu_new();
 
-    GtkWidget *file_item = gtk_menu_item_new_with_label("File");
-    GtkWidget *edit_item = gtk_menu_item_new_with_label("Edit");
-    GtkWidget *server_item = gtk_menu_item_new_with_label("Servers");
-    GtkWidget *command_item = gtk_menu_item_new_with_label("Commands");
+    GtkWidget *file_item = gtk_menu_item_new_with_label(_("File"));
+    GtkWidget *edit_item = gtk_menu_item_new_with_label(_("Edit"));
+    GtkWidget *server_item = gtk_menu_item_new_with_label(_("Servers"));
+    GtkWidget *command_item = gtk_menu_item_new_with_label(_("Commands"));
 
     GtkWidget *file_quit = gtk_image_menu_item_new_with_label(
-        "Quit");
+        _("Quit"));
     GtkWidget *file_sendhost = gtk_image_menu_item_new_with_label(
-        "Send hostname");
+        _("Send hostname"));
     GtkWidget *file_add = gtk_menu_item_new_with_label(
-        "Add session");
+        _("Add session"));
 
     GtkWidget *edit_pref = gtk_image_menu_item_new_with_label(
-        "Edit");
+        _("Edit"));
 
     GtkAccelGroup *accel = gtk_accel_group_new();
 
