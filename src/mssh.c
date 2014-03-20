@@ -4,7 +4,7 @@
 #include <getopt.h>
 #include <errno.h>
 
-#define GETTEXT_PACKAGE "gtk20"
+#define GETTEXT_PACKAGE "mssh"
 #include <glib/gi18n-lib.h>
 
 #include <gtk/gtk.h>
@@ -246,9 +246,6 @@ int main(int argc, char* argv[], char* env[])
         {0, 0, 0, 0}
     };
 
-    bindtextdomain(GETTEXT_PACKAGE, PROGRAMNAME_LOCALEDIR);
-    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
-    textdomain(GETTEXT_PACKAGE);
 
     if((home = getenv("HOME")) != NULL)
     {
@@ -354,6 +351,11 @@ int main(int argc, char* argv[], char* env[])
     }
 
     gtk_init(&argc, &argv);
+
+    setlocale (LC_ALL, "");
+    bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
+    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+    textdomain(GETTEXT_PACKAGE);
 
     window = GTK_WIDGET(mssh_window_new());
 

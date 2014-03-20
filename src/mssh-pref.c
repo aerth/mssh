@@ -1,5 +1,8 @@
 #include <gconf/gconf-client.h>
 
+#define GETTEXT_PACKAGE "mssh"
+#include <glib/gi18n-lib.h>
+
 #include "mssh-gconf.h"
 
 #include "mssh-pref.h"
@@ -209,49 +212,49 @@ static void mssh_pref_init(MSSHPref* pref)
     GtkWidget *content = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
 
     GtkWidget *font_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    GtkWidget *font_label = gtk_label_new("Font:");
+    GtkWidget *font_label = gtk_label_new(_("Font:"));
     GtkWidget *font_select = gtk_font_button_new();
 
     GtkWidget *colour_table = gtk_grid_new();
-    GtkWidget *bg_colour_label = gtk_label_new("Background:");
+    GtkWidget *bg_colour_label = gtk_label_new(_("Background:"));
     GtkWidget *bg_colour_select = gtk_color_button_new();
-    GtkWidget *fg_colour_label = gtk_label_new("Foreground:");
+    GtkWidget *fg_colour_label = gtk_label_new(_("Foreground:"));
     GtkWidget *fg_colour_select = gtk_color_button_new();
 
     GtkWidget *recolor_focused_check = gtk_check_button_new_with_label(
-        "Use different color for focused window");
+        _("Use different color for focused window"));
 
     GtkWidget *colour_table_focus = gtk_grid_new();
-    GtkWidget *bg_colour_label_focus = gtk_label_new("Background for focused window:");
+    GtkWidget *bg_colour_label_focus = gtk_label_new(_("Background for focused window:"));
     GtkWidget *bg_colour_select_focus = gtk_color_button_new();
-    GtkWidget *fg_colour_label_focus = gtk_label_new("Foreground for focused window:");
+    GtkWidget *fg_colour_label_focus = gtk_label_new(_("Foreground for focused window:"));
     GtkWidget *fg_colour_select_focus = gtk_color_button_new();
     GtkWidget *exit_check = gtk_check_button_new_with_label(
-        "Quit after all sessions have ended");
+        _("Quit after all sessions have ended"));
     GtkWidget *close_check = gtk_check_button_new_with_label(
-        "Close ended sessions");
+        _("Close ended sessions"));
 
     GtkWidget *timeout_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *timeout_label1 = gtk_label_new(
-        "Closed ended sessions after");
+        _("Closed ended sessions after"));
     GtkAdjustment *timeout_adj = gtk_adjustment_new(3, 0, 100, 1, 10, 0);
     GtkWidget *timeout_select = gtk_spin_button_new(
         GTK_ADJUSTMENT(timeout_adj), 1, 0);
-    GtkWidget *timeout_label2 = gtk_label_new("seconds");
+    GtkWidget *timeout_label2 = gtk_label_new(_("seconds"));
 
     GtkWidget *columns_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    GtkWidget *columns_label = gtk_label_new("Columns:");
+    GtkWidget *columns_label = gtk_label_new(_("Columns:"));
     GtkAdjustment *columns_adj = gtk_adjustment_new(2, 1, 10, 1, 10, 0);
     GtkWidget *columns_select = gtk_spin_button_new(
         GTK_ADJUSTMENT(columns_adj), 1, 0);
 
     GtkWidget *backscroll_buffer_size_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    GtkWidget *backscroll_buffer_size_label = gtk_label_new("Scrollback Lines:");
+    GtkWidget *backscroll_buffer_size_label = gtk_label_new(_("Scrollback Lines:"));
     GtkAdjustment *backscroll_buffer_size_adj = gtk_adjustment_new(5000, -1, 65535, 1, 100, 0);
     GtkWidget *backscroll_buffer_size_select = gtk_spin_button_new(
         GTK_ADJUSTMENT(backscroll_buffer_size_adj), 1, 0);  
     GtkWidget *mod_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    GtkWidget *mod_label = gtk_label_new("Modifier:");
+    GtkWidget *mod_label = gtk_label_new(_("Modifier:"));
     GtkWidget *mod_ctrl_check = gtk_check_button_new_with_label("Ctrl");
     GtkWidget *mod_alt_check = gtk_check_button_new_with_label("Alt");
     GtkWidget *mod_shift_check = gtk_check_button_new_with_label("Shift");
@@ -261,7 +264,7 @@ static void mssh_pref_init(MSSHPref* pref)
     GtkWidget *close_button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
 
     GtkWidget *dir_focus_check = gtk_check_button_new_with_label(
-        "Use directional focus");
+        _("Use directional focus"));
 
     pref->ctrl = mod_ctrl_check;
     pref->shift = mod_shift_check;
@@ -339,7 +342,7 @@ static void mssh_pref_init(MSSHPref* pref)
 
     gtk_container_set_border_width(GTK_CONTAINER(content), 6);
     gtk_container_set_border_width(GTK_CONTAINER(pref), 15);
-    gtk_window_set_title(GTK_WINDOW(pref), "Preferences");
+    gtk_window_set_title(GTK_WINDOW(pref), _("Preferences"));
     gtk_window_set_resizable(GTK_WINDOW(pref), FALSE);
 
     g_signal_connect(G_OBJECT(font_select), "font-set",
