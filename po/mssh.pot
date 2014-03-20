@@ -1,0 +1,127 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: mssh 2.0\n"
+"Report-Msgid-Bugs-To: hector@debian.org\n"
+"POT-Creation-Date: 2014-03-20 17:39+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/mssh-pref.c:215
+msgid "Font:"
+msgstr ""
+
+#: src/mssh-pref.c:219
+msgid "Background:"
+msgstr ""
+
+#: src/mssh-pref.c:221
+msgid "Foreground:"
+msgstr ""
+
+#: src/mssh-pref.c:225
+msgid "Use different color for focused window"
+msgstr ""
+
+#: src/mssh-pref.c:228
+msgid "Background for focused window:"
+msgstr ""
+
+#: src/mssh-pref.c:230
+msgid "Foreground for focused window:"
+msgstr ""
+
+#: src/mssh-pref.c:233
+msgid "Quit after all sessions have ended"
+msgstr ""
+
+#: src/mssh-pref.c:235
+msgid "Close ended sessions"
+msgstr ""
+
+#: src/mssh-pref.c:239
+msgid "Closed ended sessions after"
+msgstr ""
+
+#: src/mssh-pref.c:243
+msgid "seconds"
+msgstr ""
+
+#: src/mssh-pref.c:246
+msgid "Columns:"
+msgstr ""
+
+#: src/mssh-pref.c:252
+msgid "Scrollback Lines:"
+msgstr ""
+
+#: src/mssh-pref.c:257
+msgid "Modifier:"
+msgstr ""
+
+#: src/mssh-pref.c:267
+msgid "Use directional focus"
+msgstr ""
+
+#: src/mssh-pref.c:345
+msgid "Preferences"
+msgstr ""
+
+#: src/mssh-window.c:271
+#, c-format
+msgid "mssh: Fatal Error: Can't find terminal to remove!\n"
+msgstr ""
+
+#: src/mssh-window.c:476
+msgid "File"
+msgstr ""
+
+#: src/mssh-window.c:477 src/mssh-window.c:489
+msgid "Edit"
+msgstr ""
+
+#: src/mssh-window.c:478
+msgid "Servers"
+msgstr ""
+
+#: src/mssh-window.c:479
+msgid "Commands"
+msgstr ""
+
+#: src/mssh-window.c:482
+msgid "Quit"
+msgstr ""
+
+#: src/mssh-window.c:484
+msgid "Send hostname"
+msgstr ""
+
+#: src/mssh-window.c:486
+msgid "Add session"
+msgstr ""
+
+#: src/mssh-window.c:819
+msgid "Add new session with hostname: "
+msgstr ""
+
+#: src/mssh-window.c:829
+msgid "Add"
+msgstr ""
+
+#: src/mssh-window.c:830
+msgid "Cancel"
+msgstr ""
+
+#: src/mssh-window.c:838
+msgid "Add new session"
+msgstr ""
