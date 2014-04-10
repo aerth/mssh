@@ -6,7 +6,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
-#define GETTEXT_PACKAGE "gtk20"
+#define GETTEXT_PACKAGE "mssh"
 #include <glib/gi18n-lib.h>
 
 #include "mssh-terminal.h"
@@ -268,7 +268,7 @@ static gboolean mssh_window_session_close(gpointer data)
     if(idx == -1)
     {
         fprintf(stderr,
-            "mssh: Fatal Error: Can't find terminal to remove!\n");
+            _("mssh: Fatal Error: Can't find terminal to remove!\n"));
     }
     else
     {
@@ -478,14 +478,14 @@ static void mssh_window_init(MSSHWindow* window)
     GtkWidget *server_item = gtk_menu_item_new_with_label(_("Servers"));
     GtkWidget *command_item = gtk_menu_item_new_with_label(_("Commands"));
 
-    GtkWidget *file_quit = gtk_image_menu_item_new_with_label(
+    GtkWidget *file_quit = gtk_menu_item_new_with_label(
         _("Quit"));
-    GtkWidget *file_sendhost = gtk_image_menu_item_new_with_label(
+    GtkWidget *file_sendhost = gtk_menu_item_new_with_label(
         _("Send hostname"));
     GtkWidget *file_add = gtk_menu_item_new_with_label(
         _("Add session"));
 
-    GtkWidget *edit_pref = gtk_image_menu_item_new_with_label(
+    GtkWidget *edit_pref = gtk_menu_item_new_with_label(
         _("Edit"));
 
     GtkAccelGroup *accel = gtk_accel_group_new();
@@ -816,7 +816,7 @@ static void mssh_window_add(GtkWidget *widget, gpointer data)
     content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
     /* label for text */
-    label = gtk_label_new ("Add new session with hostname: ");
+    label = gtk_label_new (_("Add new session with hostname: "));
 
     /* Add the label and entry, and show everything we've added to the dialog */
     new_session_entry = gtk_entry_new();
@@ -826,8 +826,8 @@ static void mssh_window_add(GtkWidget *widget, gpointer data)
     gtk_container_add (GTK_CONTAINER (content_area), label);
     gtk_container_add (GTK_CONTAINER (content_area), new_session_entry);
     /* add two buttons */
-    button_add = gtk_dialog_add_button(GTK_DIALOG(dialog), "Add", GTK_RESPONSE_ACCEPT);
-    gtk_dialog_add_button(GTK_DIALOG(dialog), "Cancel", GTK_RESPONSE_CANCEL);
+    button_add = gtk_dialog_add_button(GTK_DIALOG(dialog), _("Add"), GTK_RESPONSE_ACCEPT);
+    gtk_dialog_add_button(GTK_DIALOG(dialog), _("Cancel"), GTK_RESPONSE_CANCEL);
     /* make the add button the default */
     gtk_widget_grab_default(button_add);
     /* set dialog properties (modal, etc) */
@@ -835,7 +835,7 @@ static void mssh_window_add(GtkWidget *widget, gpointer data)
     gtk_window_set_destroy_with_parent(GTK_WINDOW(dialog), TRUE);
     gtk_window_set_transient_for (GTK_WINDOW(dialog), GTK_WINDOW(window));
     /* set it's title */
-    gtk_window_set_title(GTK_WINDOW(dialog), "Add new session");
+    gtk_window_set_title(GTK_WINDOW(dialog), _("Add new session"));
 
     /* catch the activate signal (hitting enter) */
     g_signal_connect(G_OBJECT(new_session_entry), "activate",

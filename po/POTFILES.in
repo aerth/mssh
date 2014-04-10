@@ -1,0 +1,5 @@
+./src/mssh.c
+./src/mssh-gconf.c
+./src/mssh-pref.c
+./src/mssh-terminal.c
+./src/mssh-window.c

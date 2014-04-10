@@ -1,6 +1,7 @@
 AC_INIT([MultiSSH], [2.0], [hector@debian.org], [mssh])
 AM_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE
+AM_GNU_GETTEXT([external])
 
 AC_PROG_CC
 
@@ -16,7 +17,7 @@ fi
 
 AM_GCONF_SOURCE_2
 
-AC_OUTPUT(
+AC_OUTPUT( po/Makefile.in
     Makefile
     src/Makefile
 )
