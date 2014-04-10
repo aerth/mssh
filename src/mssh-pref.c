@@ -258,7 +258,7 @@ static void mssh_pref_init(MSSHPref* pref)
     GtkWidget *mod_super_check = gtk_check_button_new_with_label("Super");
 
     GtkWidget *close_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    GtkWidget *close_button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
+    GtkWidget *close_button = gtk_button_new_with_label("Close");
 
     GtkWidget *dir_focus_check = gtk_check_button_new_with_label(
         "Use directional focus");
