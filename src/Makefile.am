@@ -1,6 +1,6 @@
 AM_CFLAGS = -pedantic-errors -Werror -Wall -Wfatal-errors -Wwrite-strings
 
-INCLUDES = $(MSSH_CFLAGS)
+AM_CPPFLAGS = $(MSSH_CFLAGS)
 
 bin_PROGRAMS = mssh
 
