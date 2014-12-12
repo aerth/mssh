@@ -476,10 +476,8 @@ static void mssh_window_init(MSSHWindow* window)
     GtkWidget *command_item = gtk_menu_item_new_with_label("Commands");
 
     GtkWidget *file_quit = gtk_menu_item_new_with_mnemonic("_Quit");
-    GtkWidget *file_sendhost = gtk_image_menu_item_new_with_label(
-        "Send hostname");
-    GtkWidget *file_add = gtk_menu_item_new_with_label(
-        "Add session");
+    GtkWidget *file_sendhost = gtk_menu_item_new_with_label("Send hostname");
+    GtkWidget *file_add = gtk_menu_item_new_with_label("Add session");
 
     GtkWidget *edit_pref = gtk_menu_item_new_with_mnemonic("_Preferences");
 
