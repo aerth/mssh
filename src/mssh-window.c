@@ -269,6 +269,11 @@ static gboolean mssh_window_session_close(gpointer data)
     }
     else
     {
+        /* set the focus on the entry only if the terminal closed has it */
+        if ( gtk_window_get_focus(GTK_WINDOW(data_pair->window)) == GTK_WIDGET(data_pair->terminal) ) {
+            gtk_window_set_focus(GTK_WINDOW(data_pair->window), GTK_WIDGET(data_pair->window->global_entry));
+        }
+
         gtk_widget_destroy(data_pair->terminal->menu_item);
 
         gtk_container_remove(GTK_CONTAINER(data_pair->window->grid),
@@ -278,8 +283,6 @@ static gboolean mssh_window_session_close(gpointer data)
 
         mssh_window_relayout(data_pair->window);
 
-        /* set the focus on the entry */
-        gtk_window_set_focus(GTK_WINDOW(data_pair->window), GTK_WIDGET(data_pair->window->global_entry));
     }
 
     if(data_pair->window->terminals->len == 0 &&
@@ -475,15 +478,11 @@ static void mssh_window_init(MSSHWindow* window)
     GtkWidget *server_item = gtk_menu_item_new_with_label("Servers");
     GtkWidget *command_item = gtk_menu_item_new_with_label("Commands");
 
-    GtkWidget *file_quit = gtk_menu_item_new_with_label(
-        "Quit");
-    GtkWidget *file_sendhost = gtk_menu_item_new_with_label(
-        "Send hostname");
-    GtkWidget *file_add = gtk_menu_item_new_with_label(
-        "Add session");
+    GtkWidget *file_quit = gtk_menu_item_new_with_mnemonic("_Quit");
+    GtkWidget *file_sendhost = gtk_menu_item_new_with_label("Send hostname");
+    GtkWidget *file_add = gtk_menu_item_new_with_label("Add session");
 
-    GtkWidget *edit_pref = gtk_menu_item_new_with_label(
-        "Edit");
+    GtkWidget *edit_pref = gtk_menu_item_new_with_mnemonic("_Preferences");
 
     GtkAccelGroup *accel = gtk_accel_group_new();
 
