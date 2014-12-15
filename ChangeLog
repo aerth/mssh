@@ -4,6 +4,8 @@
 
 	Added Spanish translation
 
+	Bumped to version 2.1
+
 2014-12-12 Héctor García  <hector@debian.org>
 
 	Upgrade deprecated funtions to support GTK 3.14

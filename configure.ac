@@ -1,4 +1,4 @@
-AC_INIT([MultiSSH], [2.0], [hector@debian.org], [mssh])
+AC_INIT([MultiSSH], [2.1], [hector@debian.org], [mssh])
 AM_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE
 
