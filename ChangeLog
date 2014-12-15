@@ -1,3 +1,9 @@
+2014-12-12 Héctor García  <hector@debian.org>
+
+	Upgrade deprecated funtions to support GTK 3.14
+
+	Set the focus on the global entry only if the terminal closed has it.
+
 2014-03-17  Héctor García  <hector@debian.org>
 
 	Release as mssh 2.0
