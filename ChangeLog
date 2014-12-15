@@ -1,3 +1,9 @@
+2014-12-15 Héctor García  <hector@debian.org>
+
+	Integrated gettext support
+
+	Added Spanish translation
+
 2014-12-12 Héctor García  <hector@debian.org>
 
 	Upgrade deprecated funtions to support GTK 3.14
