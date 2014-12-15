@@ -6,9 +6,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: mssh 2.0\n"
-"Report-Msgid-Bugs-To: hector@debian.org\n"
-"POT-Creation-Date: 2014-03-20 17:39+0100\n"
-"PO-Revision-Date: 2014-03-19 13:59+0100\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=glib&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2014-12-15 12:29+0100\n"
+"PO-Revision-Date: 2014-12-15 12:31+0100\n"
 "Last-Translator: Héctor García <hector@debian.org>\n"
 "Language-Team: \n"
 "Language: es\n"
@@ -16,111 +17,118 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/mssh-pref.c:215
+#: .././src/mssh-pref.c:215
 msgid "Font:"
 msgstr "Fuente:"
 
-#: src/mssh-pref.c:219
+#: .././src/mssh-pref.c:219
 msgid "Background:"
 msgstr "Color del fondo:"
 
-#: src/mssh-pref.c:221
+#: .././src/mssh-pref.c:221
 msgid "Foreground:"
 msgstr "Color del texto:"
 
-#: src/mssh-pref.c:225
+#: .././src/mssh-pref.c:225
 msgid "Use different color for focused window"
 msgstr "Usar un color diferente para la venta con el foco"
 
-#: src/mssh-pref.c:228
+#: .././src/mssh-pref.c:228
 msgid "Background for focused window:"
 msgstr "Color del fondo para la venta con el foco:"
 
-#: src/mssh-pref.c:230
+#: .././src/mssh-pref.c:230
 msgid "Foreground for focused window:"
 msgstr "Color del texto para la venta con el foco:"
 
-#: src/mssh-pref.c:233
+#: .././src/mssh-pref.c:233
 msgid "Quit after all sessions have ended"
 msgstr "Cerrar tras finalizar todas las sesiones"
 
-#: src/mssh-pref.c:235
+#: .././src/mssh-pref.c:235
 msgid "Close ended sessions"
 msgstr "Cierra sesiones finalizadas"
 
-#: src/mssh-pref.c:239
+#: .././src/mssh-pref.c:239
 msgid "Closed ended sessions after"
 msgstr "Cierra sesiones finalizadas tras"
 
-#: src/mssh-pref.c:243
+#: .././src/mssh-pref.c:243
 msgid "seconds"
 msgstr "segundos"
 
-#: src/mssh-pref.c:246
+#: .././src/mssh-pref.c:246
 msgid "Columns:"
 msgstr "Columnas:"
 
-#: src/mssh-pref.c:252
+#: .././src/mssh-pref.c:252
 msgid "Scrollback Lines:"
 msgstr "Líneas a desplazar hacia atrás:"
 
-#: src/mssh-pref.c:257
+#: .././src/mssh-pref.c:257
 msgid "Modifier:"
 msgstr "Modificador:"
 
-#: src/mssh-pref.c:267
+#: .././src/mssh-pref.c:267
 msgid "Use directional focus"
 msgstr "Usar foco direccional"
 
-#: src/mssh-pref.c:345
+#: .././src/mssh-pref.c:345
 msgid "Preferences"
 msgstr "Preferencias"
 
-#: src/mssh-window.c:271
+#: .././src/mssh-window.c:271
 #, c-format
 msgid "mssh: Fatal Error: Can't find terminal to remove!\n"
 msgstr "mssh: Error Fatal: ¡No pude encontrar el terminal a borrar!\n"
 
-#: src/mssh-window.c:476
+#: .././src/mssh-window.c:479
 msgid "File"
 msgstr "Archivo"
 
-#: src/mssh-window.c:477 src/mssh-window.c:489
+#: .././src/mssh-window.c:480
 msgid "Edit"
 msgstr "Editar"
 
-#: src/mssh-window.c:478
+#: .././src/mssh-window.c:481
 msgid "Servers"
 msgstr "Servidores"
 
-#: src/mssh-window.c:479
+#: .././src/mssh-window.c:482
 msgid "Commands"
 msgstr "Comandos"
 
-#: src/mssh-window.c:482
-msgid "Quit"
-msgstr "Salir"
+#: .././src/mssh-window.c:484
+msgid "_Quit"
+msgstr "_Salir"
 
-#: src/mssh-window.c:484
+#: .././src/mssh-window.c:485
 msgid "Send hostname"
 msgstr "Enviar 'hostname'"
 
-#: src/mssh-window.c:486
+#: .././src/mssh-window.c:486
 msgid "Add session"
 msgstr "Añadir sesión"
 
-#: src/mssh-window.c:819
+#: .././src/mssh-window.c:488
+msgid "_Edit"
+msgstr "_Editar"
+
+#. label for text
+#: .././src/mssh-window.c:818
 msgid "Add new session with hostname: "
 msgstr "Añadir una sesión nueva con nombre de host: "
 
-#: src/mssh-window.c:829
+#. add two buttons
+#: .././src/mssh-window.c:828
 msgid "Add"
 msgstr "Añadir"
 
-#: src/mssh-window.c:830
+#: .././src/mssh-window.c:829
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/mssh-window.c:838
+#. set it's title
+#: .././src/mssh-window.c:837
 msgid "Add new session"
 msgstr "Añadir nueva sesión"
