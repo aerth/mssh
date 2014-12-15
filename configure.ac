@@ -3,6 +3,9 @@ AM_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE
 AM_GNU_GETTEXT([external])
 
+AC_SUBST([GETTEXT_PACKAGE], [mssh])
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"], [Define to the gettext package name.])
+
 AC_PROG_CC
 
 PKG_CHECK_MODULES(MSSH, [gtk+-3.0 vte-2.90 gconf-2.0])
