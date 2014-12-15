@@ -1,10 +1,18 @@
 AC_INIT([MultiSSH], [2.0], [hector@debian.org], [mssh])
 AM_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE
-AM_GNU_GETTEXT([external])
 
-AC_SUBST([GETTEXT_PACKAGE], [mssh])
-AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"], [Define to the gettext package name.])
+GETTEXT_PACKAGE=mssh
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
+                    [The prefix for our gettext translation domains.])
+IT_PROG_INTLTOOL(0.26)
+
+#AM_GNU_GETTEXT([external])
+
+
+#AC_SUBST([GETTEXT_PACKAGE], [mssh])
+#AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"], [Define to the gettext package name.])
 
 AC_PROG_CC
 
