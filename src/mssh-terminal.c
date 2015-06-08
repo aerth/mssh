@@ -67,16 +67,17 @@ void mssh_terminal_start_session(MSSHTerminal *terminal, char **env)
          args[4] = NULL;
     }
 
-    vte_terminal_fork_command_full(VTE_TERMINAL(terminal),
-                                   VTE_PTY_NO_LASTLOG|VTE_PTY_NO_UTMP|VTE_PTY_NO_WTMP,
-                                   NULL,  /* working dir */
-                                   args,
-                                   env,
-                                   G_SPAWN_SEARCH_PATH,
-                                   NULL,  /* child_setup */
-                                   NULL,  /* child_setup_data */
-                                   NULL,  /* *child_pid */
-                                   NULL); /* Error handling */
+    vte_terminal_spawn_sync(VTE_TERMINAL(terminal),
+                            VTE_PTY_NO_LASTLOG|VTE_PTY_NO_UTMP|VTE_PTY_NO_WTMP,
+                            NULL,  /* working dir */
+                            args,
+                            env,
+                            G_SPAWN_SEARCH_PATH,
+                            NULL,  /* child_setup */
+                            NULL,  /* child_setup_data */
+                            NULL,  /* *child_pid */
+                            NULL,  /* *cancellable */
+                            NULL); /* Error handling */
 
     free(args[0]);
 }
@@ -113,9 +114,6 @@ static void mssh_terminal_init(MSSHTerminal* terminal)
 {
     terminal->started = 0;
     terminal->ended = 0;
-
-    vte_terminal_set_word_chars(VTE_TERMINAL(terminal),
-        "-A-Za-z0-9,./?%&#:_=+@~");
 
     g_signal_connect(G_OBJECT(terminal), "child-exited",
         G_CALLBACK(mssh_terminal_child_exited), terminal);
