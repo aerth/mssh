@@ -1,3 +1,11 @@
+2015-06-08 Héctor García  <hector@debian.org>
+
+	Added info on man page
+
+	Migrated to vte 0.40
+
+	Bumped to version 2.2
+
 2014-12-15 Héctor García  <hector@debian.org>
 
 	Integrated gettext support
