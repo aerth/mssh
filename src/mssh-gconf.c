@@ -8,20 +8,22 @@
 void mssh_gconf_notify_font(GConfClient *client, guint cnxn_id,
     GConfEntry *entry, gpointer data)
 {
+    PangoFontDescription *font_desc;
     GConfValue *value;
-    const gchar *font;
     int i;
 
     MSSHWindow *window = MSSH_WINDOW(data);
 
     value = gconf_entry_get_value(entry);
-    font = gconf_value_get_string(value);
 
+    font_desc = pango_font_description_from_string(gconf_value_get_string(value));
     for(i = 0; i < window->terminals->len; i++)
     {
-        vte_terminal_set_font_from_string(VTE_TERMINAL(g_array_index(
-            window->terminals, MSSHTerminal*, i)), font);
+        vte_terminal_set_font(VTE_TERMINAL(g_array_index(
+            window->terminals, MSSHTerminal*, i)), font_desc);
     }
+
+    pango_font_description_free(font_desc);
 }
 
 void mssh_gconf_notify_fg_colour(GConfClient *client, guint cnxn_id,
@@ -40,7 +42,7 @@ void mssh_gconf_notify_fg_colour(GConfClient *client, guint cnxn_id,
 
     for(i = 0; i < window->terminals->len; i++)
     {
-        vte_terminal_set_color_foreground_rgba(VTE_TERMINAL(g_array_index(
+        vte_terminal_set_color_foreground(VTE_TERMINAL(g_array_index(
             window->terminals, MSSHTerminal*, i)), &colour);
     }
 }
@@ -61,7 +63,7 @@ void mssh_gconf_notify_bg_colour(GConfClient *client, guint cnxn_id,
 
     for(i = 0; i < window->terminals->len; i++)
     {
-        vte_terminal_set_color_background_rgba(VTE_TERMINAL(g_array_index(
+        vte_terminal_set_color_background(VTE_TERMINAL(g_array_index(
             window->terminals, MSSHTerminal*, i)), &colour);
     }
 }
@@ -98,7 +100,7 @@ void mssh_gconf_notify_fg_colour_focus(GConfClient *client, guint cnxn_id,
 
     if (idx != -1) {
         /* found the currently focused terminal, update the color */
-        vte_terminal_set_color_foreground_rgba(VTE_TERMINAL(g_array_index(
+        vte_terminal_set_color_foreground(VTE_TERMINAL(g_array_index(
             window->terminals, MSSHTerminal*, idx)), &colour);
     }
 }
@@ -135,7 +137,7 @@ void mssh_gconf_notify_bg_colour_focus(GConfClient *client, guint cnxn_id,
 
     if (idx != -1) {
         /* found the currently focused terminal, update the color */
-        vte_terminal_set_color_background_rgba(VTE_TERMINAL(g_array_index(
+        vte_terminal_set_color_background(VTE_TERMINAL(g_array_index(
             window->terminals, MSSHTerminal*, idx)), &colour);
     }
 
