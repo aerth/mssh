@@ -7,7 +7,7 @@ G_DEFINE_TYPE(MSSHTerminal, mssh_terminal, VTE_TYPE_TERMINAL)
 
 static void mssh_terminal_init(MSSHTerminal* terminal);
 static void mssh_terminal_class_init(MSSHTerminalClass *klass);
-static void mssh_terminal_child_exited(VteTerminal *vte, gpointer data);
+static void mssh_terminal_child_exited(VteTerminal *vte, int pid, gpointer data);
 static gboolean mssh_terminal_focused(GtkWidget *widget,
     GtkDirectionType dir, gpointer data);
 
@@ -134,7 +134,7 @@ static void mssh_terminal_class_init(MSSHTerminalClass *klass)
         g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, NULL);
 }
 
-static void mssh_terminal_child_exited(VteTerminal *vte, gpointer data)
+static void mssh_terminal_child_exited(VteTerminal *vte, int pid, gpointer data)
 {
     char msg[] = "\r\n[Child Exited]\r\n";
 
